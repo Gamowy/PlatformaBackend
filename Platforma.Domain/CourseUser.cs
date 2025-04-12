@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Platforma.Domain
 {
-    public enum UserStatus { Awaiting, Accepted, Rejected}
+    public enum UserStatus { Awaiting, Accepted, Rejected }
     
     public class CourseUser
     {

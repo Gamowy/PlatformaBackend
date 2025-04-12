@@ -12,7 +12,10 @@ namespace Platforma.Domain
         public List<User> Users { get; set; }
         public string Name { get; set; }
         public string Description { get; set; }
-        public Guid Owner { get; set; }
+        public Guid OwnerId { get; set; }
+        public User Owner { get; set; }
         public string AcademicYear { get; set; }
+
+        public List<Assignment> Assignments { get; set; }
     }
 }

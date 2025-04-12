@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.EntityFrameworkCore;
 using Platforma.Infrastructure;
+using Microsoft.EntityFrameworkCore.Design;
 
 
 var builder = WebApplication.CreateBuilder(args);
