@@ -73,6 +73,7 @@ try
     //var userManager = service.GetRequiredService<UserManager<AppUser>>();
 
     context.Database.Migrate();
+    await DbSeed.SeedData(context);
     //await Seed.SeedData(context, userManager);
 }
 catch (Exception ex)

@@ -10,7 +10,7 @@ namespace Platforma.Infrastructure
         public DbSet<User> Users { get; set; }
         public DbSet<Course> Courses { get; set; }
         public DbSet<Assignment> Assignments { get; set; }
-        public DbSet<Answer> Answer { get; set; }
+        public DbSet<Answer> Answers { get; set; }
         public DbSet<CourseUser> CourseUsers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,8 +17,8 @@ namespace Platforma.Domain
         public User User { get; set; }
 
         public DateTime SubmittedDate { get; set; }
-        public string Comment { get; set; }
-        public float Mark { get; set; }
+        public string? Comment { get; set; }
+        public float? Mark { get; set; }
         public string FilePath { get; set; }
     }
 }

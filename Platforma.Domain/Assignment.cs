@@ -17,7 +17,7 @@ namespace Platforma.Domain
         public DateTime OpenDate { get; set; }
         public DateTime Deadline { get; set; }
         public string FilePath { get; set; }
-        public bool AnswerRequired { get; set; }
+        public bool AnswerRequired { get; set; } = true;
         public string AcceptedFileTypes { get; set; }
 
         public List<Answer> Answers { get; set; }
