@@ -6,6 +6,9 @@ using Platforma.Infrastructure;
 using Platforma.Application.Courses;
 using Platforma.Domain;
 using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,7 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-    .AddJsonFile("local.json", optional: false, reloadOnChange: true)
+    //.AddJsonFile("local.json", optional: false, reloadOnChange: true)
     .AddEnvironmentVariables();
 
 // Add services to the container.
@@ -23,6 +26,24 @@ builder.Configuration
 //    var policy = new AuthorizationPolicyBuilder().RequireAuthenticatedUser().Build();
 //    opt.Filters.Add(new AuthorizeFilter(policy));
 //});
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(x =>
+    {
+        x.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+        {
+            ValidIssuer = builder.Configuration["JwtConfig:Issuer"],
+            ValidAudience = builder.Configuration["JwtConfig:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["JwtConfig:Key"]!)),
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateIssuerSigningKey = true,
+            ValidateLifetime = true
+        };
+    });
+
+builder.Services.AddAuthorization();
+
 builder.Services.AddControllers();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
