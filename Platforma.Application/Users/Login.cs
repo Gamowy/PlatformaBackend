@@ -17,12 +17,12 @@ namespace Platforma.Application.Users
 {
     public class Login
     {
-        public class Query : IRequest<Result<String>>
+        public class Query : IRequest<Result<TokenDTO>>
         {
             public required UserLoginDTO UserLoginDTO {  get; set; }
         }
 
-        public class Handler : IRequestHandler<Query, Result<String>>
+        public class Handler : IRequestHandler<Query, Result<TokenDTO>>
         {
             private readonly DataContext _context;
             private readonly IConfiguration _configuration;
@@ -33,19 +33,19 @@ namespace Platforma.Application.Users
                 _configuration = configuration;
             }
 
-            public async Task<Result<String>> Handle(Query request, CancellationToken cancellationToken)
+            public async Task<Result<TokenDTO>> Handle(Query request, CancellationToken cancellationToken)
             {
                 var user = _context.Users.Where(u => u.Username == request.UserLoginDTO.Username).FirstOrDefault();
 
                 if (user != null)
                 {
                     if (new PasswordHasher<User>().VerifyHashedPassword(user, user.Password, request.UserLoginDTO.Password) == PasswordVerificationResult.Success)
-                        return Result<String>.Success(await CreateToken(user));
+                        return Result<TokenDTO>.Success(await CreateToken(user));
                 }
-                    return Result<String>.Failure("wrong username or password");
+                    return Result<TokenDTO>.Failure("wrong username or password");
             }
 
-            private async Task<String> CreateToken(User user)
+            private Task<TokenDTO> CreateToken(User user)
             {
                 var claims = new List<Claim>
                 {
@@ -70,8 +70,10 @@ namespace Platforma.Application.Users
                 var tokenHandler = new JwtSecurityTokenHandler();
                 var securityToken = tokenHandler.CreateToken(tokenDescriptor);
                 var accessToken = tokenHandler.WriteToken(securityToken);
-                
-                return accessToken;
+
+                var tokenJson = new TokenDTO(accessToken);
+
+                return Task.FromResult(tokenJson);
             }
         }
     }
