@@ -16,7 +16,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Configuration
     .SetBasePath(Directory.GetCurrentDirectory())
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-    //.AddJsonFile("local.json", optional: false, reloadOnChange: true)
+    .AddJsonFile("local.json", optional: false, reloadOnChange: true)
     .AddEnvironmentVariables();
 
 // Add services to the container.
@@ -99,11 +99,9 @@ var service = scope.ServiceProvider;
 try
 {
     var context = service.GetRequiredService<DataContext>();
-    //var userManager = service.GetRequiredService<UserManager<AppUser>>();
 
     context.Database.Migrate();
     await DbSeed.SeedData(context);
-    //await Seed.SeedData(context, userManager);
 }
 catch (Exception ex)
 {

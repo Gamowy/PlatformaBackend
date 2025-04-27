@@ -39,20 +39,19 @@ namespace Platforma.Application.Users
 
                 if (user != null)
                 {
-                    var hashed = new PasswordHasher<User>().HashPassword(user, user.Password);
                     if (new PasswordHasher<User>().VerifyHashedPassword(user, user.Password, request.UserLoginDTO.Password) == PasswordVerificationResult.Success)
-                        return Result<String>.Success(CreateToken(user));
+                        return Result<String>.Success(await CreateToken(user));
                 }
-                     return Result<String>.Failure("wrong username or password");
+                    return Result<String>.Failure("wrong username or password");
             }
 
-            private string CreateToken(User user)
+            private async Task<String> CreateToken(User user)
             {
                 var claims = new List<Claim>
-            {
-                new Claim(ClaimTypes.Name, user.Username),
-                new Claim(ClaimTypes.Role, user.UserType.ToString())
-            };
+                {
+                    new Claim(ClaimTypes.Name, user.Username),
+                    new Claim(ClaimTypes.Role, user.UserType.ToString())
+                };
 
                 var issuer = _configuration["JwtConfig:Issuer"];
                 var audience = _configuration["JwtConfig:Audience"];

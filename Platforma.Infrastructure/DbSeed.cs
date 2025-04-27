@@ -1,4 +1,6 @@
-﻿using Microsoft.Identity.Client;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client;
 using Platforma.Domain;
 using System;
 using System.Collections.Generic;
@@ -20,7 +22,10 @@ namespace Platforma.Infrastructure
 
         private static async Task seedUsers(DataContext dataContext)
         {
-            //TODO: po dodaniu logowania podmienić na obsługę za pomocą userManagera i szyfrowanie haseł
+            //Usunąć jeżeli wszyscy zrobią pull na branchu
+            if (dataContext.Users.Any() && dataContext.Users.Where(u => u.Password == "student").First() != null) {
+                dataContext.Users.ExecuteDelete();
+            }
 
             if (dataContext.Users.Any()) return;
 
@@ -30,6 +35,11 @@ namespace Platforma.Infrastructure
                 new User{ Username = "nauczyciel", Password = "nauczyciel", Name = "Nauczyciel 1", UserType = UserType.Teacher},
                 new User{ Username = "student", Password = "student", Name = "Student 1", UserType = UserType.Student, StudentIdNumber = "357895"}
             };
+
+            foreach (var user in users)
+            {
+                user.Password = new PasswordHasher<User>().HashPassword(user, user.Password);
+            }
 
             await dataContext.Users.AddRangeAsync(users);
             await dataContext.SaveChangesAsync();
