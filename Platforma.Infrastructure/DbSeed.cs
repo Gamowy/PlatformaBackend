@@ -23,17 +23,17 @@ namespace Platforma.Infrastructure
         private static async Task seedUsers(DataContext dataContext)
         {
             //Usunąć jeżeli wszyscy zrobią pull na branchu
-            if (dataContext.Users.Any() && dataContext.Users.Where(u => u.Password == "student").First() != null) {
-                dataContext.Users.ExecuteDelete();
-            }
+            //if (dataContext.Users.Any() && dataContext.Users.Where(u => u.Password == "student").First() != null) {
+            //    dataContext.Users.ExecuteDelete();
+            //}
 
             if (dataContext.Users.Any()) return;
 
             var users = new List<User>
             {
-                new User{ Username = "admin", Password = "admin", Name = "Pan admin", UserType = UserType.Administrator},
-                new User{ Username = "nauczyciel", Password = "nauczyciel", Name = "Nauczyciel 1", UserType = UserType.Teacher},
-                new User{ Username = "student", Password = "student", Name = "Student 1", UserType = UserType.Student, StudentIdNumber = "357895"}
+                new User{ Username = "admin", Password = "admin", Name = "Pan admin", UserType = User.Roles.Administrator},
+                new User{ Username = "nauczyciel", Password = "nauczyciel", Name = "Nauczyciel 1", UserType = User.Roles.Teacher},
+                new User{ Username = "student", Password = "student", Name = "Student 1", UserType = User.Roles.Student, StudentIdNumber = "357895"}
             };
 
             foreach (var user in users)
@@ -50,8 +50,8 @@ namespace Platforma.Infrastructure
             if (dataContext.Courses.Any()) return;
             if (!dataContext.Users.Any()) return;
             
-            var teacher = dataContext.Users.Where(u => u.UserType == UserType.Teacher).First();
-            var student = dataContext.Users.Where(u => u.UserType == UserType.Student).First();
+            var teacher = dataContext.Users.Where(u => u.UserType == User.Roles.Teacher).First();
+            var student = dataContext.Users.Where(u => u.UserType == User.Roles.Student).First();
 
             if(teacher == null || student == null) return;
 

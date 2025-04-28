@@ -2,7 +2,7 @@
 
 namespace Platforma.Domain
 {
-    public enum UserType { Student, Teacher, Administrator }
+    //public enum UserType { Student, Teacher, Administrator }
 
     public class User 
     {
@@ -14,7 +14,14 @@ namespace Platforma.Domain
         public string Username { get; set; }
         public string Password { get; set; }
         public string Name { get; set; }
-        public UserType UserType { get; set; }
+        public string UserType { get; set; }
         public List<Answer> Answers { get; set; }
+
+        public struct Roles
+        {
+            public const string Administrator = "Administrator";
+            public const string Teacher = "Teacher";
+            public const string Student = "Student";
+        }
     }
 }

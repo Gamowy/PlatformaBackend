@@ -50,7 +50,7 @@ namespace Platforma.Application.Users
                 var claims = new List<Claim>
                 {
                     new Claim(ClaimTypes.Name, user.Username),
-                    new Claim(ClaimTypes.Role, user.UserType.ToString())
+                    new Claim(ClaimTypes.Role, user.UserType)
                 };
 
                 var issuer = _configuration["JwtConfig:Issuer"];
