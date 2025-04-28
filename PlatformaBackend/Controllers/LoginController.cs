@@ -1,9 +1,11 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Platforma.Domain;
 using Platforma.Application.Users;
+using Microsoft.AspNetCore.Authorization;
 
 namespace PlatformaBackend.Controllers
 {
+    [AllowAnonymous]
     public class LoginController : BaseAPIController
     {
         [HttpPost]

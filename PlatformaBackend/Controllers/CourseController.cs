@@ -6,7 +6,6 @@ using Platforma.Domain;
 
 namespace PlatformaBackend.Controllers
 {
-    [Authorize]
     public class CourseController : BaseAPIController
     {
         [HttpGet]
