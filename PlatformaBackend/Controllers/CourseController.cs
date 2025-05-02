@@ -11,7 +11,7 @@ namespace PlatformaBackend.Controllers
         [HttpGet]
         public async Task<ActionResult<List<Course>>> GetCourses()
         {
-            var result = await Mediator.Send(new List.Query());
+            var result = await Mediator.Send(new CourseList.Query());
             if (result == null)
                 return NotFound();
             if (result.IsSuccess && result.Value != null)

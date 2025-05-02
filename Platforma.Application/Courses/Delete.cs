@@ -27,9 +27,9 @@ namespace Platforma.Application.Courses
 
             public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
             {
-                var car = await _context.Courses.FindAsync(request.Id);
+                var course = await _context.Courses.FindAsync(request.Id);
 
-                _context.Remove(car);
+                _context.Remove(course);
                 var result = await _context.SaveChangesAsync() > 0;
 
                 if (!result) return Result<Unit>.Failure("Failed to delete the course");

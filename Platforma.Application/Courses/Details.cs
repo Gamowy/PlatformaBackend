@@ -27,9 +27,9 @@ namespace Platforma.Application.Courses
 
             public async Task<Result<Course>> Handle(Query request, CancellationToken cancelllationToken)
             {
-                var car = await _context.Courses.FindAsync(request.id);
+                var course = await _context.Courses.FindAsync(request.id);
 
-                return Result<Course>.Success(car);
+                return Result<Course>.Success(course);
             }
         }
     }

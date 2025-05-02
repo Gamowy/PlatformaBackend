@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace Platforma.Application.Courses
 {
-    public class List
+    public class CourseList
     {
         public class Query : IRequest<Result<List<Course>>>
         {

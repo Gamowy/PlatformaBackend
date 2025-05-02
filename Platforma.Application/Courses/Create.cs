@@ -32,7 +32,7 @@ namespace Platforma.Application.Courses
             public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
             {
                 _context.Courses.Add(request.Course);
-                var reult = await _context.SaveChangesAsync() > 0;
+                var result = await _context.SaveChangesAsync() > 0;
                 return Result<Unit>.Success(Unit.Value);
             }
 
