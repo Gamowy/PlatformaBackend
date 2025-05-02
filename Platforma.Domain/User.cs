@@ -1,10 +1,13 @@
-﻿namespace Platforma.Domain
+﻿using System.Text.Json.Serialization;
+
+namespace Platforma.Domain
 {
     public enum UserType { Student, Teacher, Administrator }
 
     public class User
     {
         public Guid Id { get; set; }
+        [JsonIgnore]
         public List<Course> Courses { get; set; } 
         public List<Course> OwnedCourses { get; set; }
         public string? StudentIdNumber { get; set; }

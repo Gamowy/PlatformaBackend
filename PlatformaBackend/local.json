@@ -1,7 +1,10 @@
 {
-"ConnectionStrings": {
-    "DefaultConnection": "Server=localhost;Database=PlatformaBaza;User Id=root;Password=1234;Port=5010"
-
+  "JwtConfig": {
+    "Issuer": "https://localhost:7124",
+    "Audience": "https://localhost:7124",
+    "Key": "SpokojnieWFinalnymProgramieNieBedzieTuKlucza"
   },
-  "TokenKey": "super tajne haslo123!!$sdsfvsdfvdfvsdvwevrvwrvwvrvwrvdfwvworjivpoj2cvj3vjv3rjvpo;ojrvrv"
+  "ConnectionStrings": {
+    "DefaultConnection": "Server=localhost;Database=PlatformaBaza;User Id=root;Password=1234;Port=5010"
+  }
 }
