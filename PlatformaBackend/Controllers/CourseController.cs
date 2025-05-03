@@ -37,7 +37,7 @@ namespace PlatformaBackend.Controllers
         }
 
         [HttpGet("{id}")] 
-        public async Task<ActionResult<Course>> GetCar(Guid id)
+        public async Task<ActionResult<Course>> GetCourse(Guid id)
         {
             var result = await Mediator.Send(new Details.Query { id = id });
 
@@ -52,7 +52,7 @@ namespace PlatformaBackend.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> EditCar(Guid id, Course course)
+        public async Task<IActionResult> EditCourse(Guid id, Course course)
         {
             course.Id = id;
             var result = await Mediator.Send(new Edit.Command { Course = course });
@@ -66,7 +66,7 @@ namespace PlatformaBackend.Controllers
             return BadRequest(result.Error);
         }
         [HttpPost]
-        public async Task<IActionResult> CreateCar(Course course)
+        public async Task<IActionResult> CreateCourse(Course course)
         {
             var result = await Mediator.Send(new Create.Command { Course = course });
 
@@ -79,7 +79,7 @@ namespace PlatformaBackend.Controllers
             return BadRequest(result.Error);
         }
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteCar(Guid id)
+        public async Task<IActionResult> DeleteCourse(Guid id)
         {
             var result = await Mediator.Send(new Delete.Command { Id = id });
 
