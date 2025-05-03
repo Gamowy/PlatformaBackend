@@ -14,13 +14,13 @@ namespace Platforma.Application.Courses
 {
     public class Create
     {
-        public class Command : IRequest<Result<Unit>>
+        public class Command : IRequest<Result<Unit?>>
         {
             public required Course Course { get; set; }
         }
 
 
-        public class Handler : IRequestHandler<Command, Result<Unit>>
+        public class Handler : IRequestHandler<Command, Result<Unit?>>
         {
             private readonly DataContext _context;
             public Handler(DataContext context)
@@ -29,11 +29,11 @@ namespace Platforma.Application.Courses
             }
 
 
-            public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Result<Unit?>> Handle(Command request, CancellationToken cancellationToken)
             {
                 _context.Courses.Add(request.Course);
                 var result = await _context.SaveChangesAsync() > 0;
-                return Result<Unit>.Success(Unit.Value);
+                return Result<Unit?>.Success(Unit.Value);
             }
 
         }

@@ -14,12 +14,12 @@ namespace Platforma.Application.Courses
     public class Edit
     {
 
-        public class Command : IRequest<Result<Unit>>
+        public class Command : IRequest<Result<Unit?>>
         {
             public required Course Course { get; set; }
         }
 
-        public class Handler : IRequestHandler<Command, Result<Unit>>
+        public class Handler : IRequestHandler<Command, Result<Unit?>>
         {
             private readonly DataContext _context;
 
@@ -28,7 +28,7 @@ namespace Platforma.Application.Courses
                 _context = context;
             }
 
-            public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Result<Unit?>> Handle(Command request, CancellationToken cancellationToken)
             {
                 var course = await _context.Courses.FindAsync(request.Course.Id);
                 if (course == null) return null;
@@ -39,8 +39,8 @@ namespace Platforma.Application.Courses
                 course.AcademicYear= request.Course.AcademicYear ?? course.AcademicYear;
 
                 var result = await _context.SaveChangesAsync() > 0;
-                if (!result) return Result<Unit>.Failure("Failed to update course.");
-                return Result<Unit>.Success(Unit.Value);
+                if (!result) return Result<Unit?>.Failure("Failed to update course.");
+                return Result<Unit?>.Success(Unit.Value);
             }
         }
 

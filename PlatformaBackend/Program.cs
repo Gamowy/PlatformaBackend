@@ -77,8 +77,6 @@ builder.Services.AddSwaggerGen( c =>
     });
 });
 
-
-
 builder.Services.AddDbContext<DataContext>(opt =>
 {
     var isRunningInContainer = Environment.GetEnvironmentVariable("RUNNING_IN_CONTAINER") == "true";
@@ -99,7 +97,6 @@ builder.Services.AddCors(opt =>
         policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:8080");
     });
 });
-
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CourseList.Handler).Assembly));
 

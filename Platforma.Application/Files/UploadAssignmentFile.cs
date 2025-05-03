@@ -13,12 +13,12 @@ namespace Platforma.Application.Files
 {
     public class UploadAssignmentFile
     {
-        public class Command : IRequest<Result<Unit>>
+        public class Command : IRequest<Result<Unit?>>
         {
             public required AssignmentUploadDTO AssignmentUploadDTO { get; set; }
         }
 
-        public class Handler : IRequestHandler<Command, Result<Unit>>
+        public class Handler : IRequestHandler<Command, Result<Unit?>>
         {
             private readonly DataContext _context;
             private readonly IConfiguration _configuration;
@@ -29,23 +29,22 @@ namespace Platforma.Application.Files
                 _configuration = configuration;
             }
 
-            public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Result<Unit?>> Handle(Command request, CancellationToken cancellationToken)
             {
                 var assignment = _context.Assignments.Find(request.AssignmentUploadDTO.AssignmentId);
                 if (assignment == null)
                 {
-                    return Result<Unit>.Failure("Assignment not found");
+                    return Result<Unit?>.Failure("Assignment not found");
                 }
                 if (!string.IsNullOrEmpty(assignment.FilePath))
                 {
-                    return Result<Unit>.Failure("File already uploaded");
+                    return Result<Unit?>.Failure("File already uploaded");
                 }
-
 
                 // Check file size
                 if (request.AssignmentUploadDTO.File.Length > 1000 * 1024 * 1024) // ~ 1GB
                 {
-                    return Result<Unit>.Failure("File size exceeds the limit");
+                    return Result<Unit?>.Failure("File size exceeds the limit");
                 }
 
                 // Create file path 
@@ -76,9 +75,9 @@ namespace Platforma.Application.Files
                 catch (Exception ex)
                 {
                     RollbackFileUpload(fullPath);
-                    return Result<Unit>.Failure($"Error saving file: {ex}");
+                    return Result<Unit?>.Failure($"Error saving file: {ex}");
                 }
-                return Result<Unit>.Success(Unit.Value);
+                return Result<Unit?>.Success(Unit.Value);
             }
 
             // Rollback file upload if error occurs

@@ -36,6 +36,10 @@ namespace Platforma.Application.Courses
                 {
                     return Result<List<User>>.Failure("Course not found.");
                 }
+                if (course.Users == null)
+                {
+                    return Result<List<User>>.Failure("No users found for this course.");
+                }
 
                 return Result<List<User>>.Success(course.Users);
             }
