@@ -11,7 +11,7 @@ using Microsoft.AspNetCore.Identity;
 
 namespace Platforma.Application.Files
 {
-    public class UploadAssignment
+    public class UploadAssignmentFile
     {
         public class Command : IRequest<Result<Unit>>
         {
@@ -31,11 +31,6 @@ namespace Platforma.Application.Files
 
             public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
             {
-                var course = _context.Courses.Find(request.AssignmentUploadDTO.CourseId);
-                if (course == null)
-                {
-                    return Result<Unit>.Failure("Course not found");
-                }
                 var assignment = _context.Assignments.Find(request.AssignmentUploadDTO.AssignmentId);
                 if (assignment == null)
                 {
@@ -56,7 +51,7 @@ namespace Platforma.Application.Files
                 // Create file path 
                 string uploadPath = _configuration["FileStorageConfig:Path"]!;
 
-                string filePath = $"assignments/{request.AssignmentUploadDTO.CourseId}/{Guid.NewGuid().ToString()}_{request.AssignmentUploadDTO.File.FileName}";
+                string filePath = $"assignments/{assignment.CourseId}/{Guid.NewGuid().ToString()}_{request.AssignmentUploadDTO.File.FileName}";
                 string fullPath = Path.Combine(uploadPath, filePath);
 
                 // Save file

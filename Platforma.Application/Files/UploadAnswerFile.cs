@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Platforma.Application.Files
 {
-    class UploadAnswer
+    class UploadAnswerFile
     {
     }
 }
