@@ -42,9 +42,10 @@ namespace Platforma.Application.Users
                     Name = request.UserRegisterDTO.Name + " " + request.UserRegisterDTO.Surname,
                     Password = request.UserRegisterDTO.Password,
                     Username = request.UserRegisterDTO.UserName,
+                    UserType = User.Roles.Student
                 };
                 newUser.Password = new PasswordHasher<User>().HashPassword(newUser, newUser.Password);
-                //_context.Users.Add(newUser);
+                _context.Users.Add(newUser);
                 var reult = await _context.SaveChangesAsync() > 0;
                 return Result<Unit?>.Success(Unit.Value);
             }
