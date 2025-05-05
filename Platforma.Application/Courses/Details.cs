@@ -7,6 +7,7 @@ using System.Runtime.ConstrainedExecution;
 using System.Text;
 using System.Threading.Tasks;
 using Platforma.Domain;
+using Microsoft.EntityFrameworkCore;
 
 namespace Platforma.Application.Courses
 {
@@ -27,9 +28,9 @@ namespace Platforma.Application.Courses
 
             public async Task<Result<Course>> Handle(Query request, CancellationToken cancelllationToken)
             {
-                var car = await _context.Courses.FindAsync(request.id);
+                var course = await _context.Courses.Include(c=>c.Users).Where(c => c.Id.Equals(request.id)).FirstOrDefaultAsync();
 
-                return Result<Course>.Success(car);
+                return Result<Course>.Success(course);
             }
         }
     }

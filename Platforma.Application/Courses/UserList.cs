@@ -12,12 +12,12 @@ namespace Platforma.Application.Courses
 {
     public class UserList
     {
-        public class Query : IRequest<Result<List<User>>>
+        public class Query : IRequest<Result<List<UserCourseDTO>>>
         {
             public required Guid CourseId { get; set; }
         }
 
-        public class Handler : IRequestHandler<Query, Result<List<User>>>
+        public class Handler : IRequestHandler<Query, Result<List<UserCourseDTO>>>
         {
             private readonly DataContext _context;
 
@@ -26,7 +26,7 @@ namespace Platforma.Application.Courses
                 _context = context;
             }
 
-            public async Task<Result<List<User>>> Handle(Query request, CancellationToken cancellationToken)
+            public async Task<Result<List<UserCourseDTO>>> Handle(Query request, CancellationToken cancellationToken)
             {
                 var course = await _context.Courses
                     .Include(c => c.Users)
@@ -34,10 +34,14 @@ namespace Platforma.Application.Courses
 
                 if (course == null)
                 {
-                    return Result<List<User>>.Failure("Course not found.");
+                    return Result<List<UserCourseDTO>>.Failure("Course not found.");
                 }
 
-                return Result<List<User>>.Success(course.Users);
+                List<UserCourseDTO> list = course.Users.Select(u => new UserCourseDTO(u.Id, u.StudentIdNumber, u.Username, u.Name, u.UserType,
+                    (_context.CourseUsers.Where(cu => cu.CourseID == request.CourseId && cu.UserID == u.Id).FirstOrDefault().Status ?? UserStatus.Awaiting)
+                    )).ToList();
+
+                return Result<List<UserCourseDTO>>.Success(list);
             }
         }
     }
