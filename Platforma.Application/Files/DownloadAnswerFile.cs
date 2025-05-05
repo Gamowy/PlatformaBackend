@@ -8,11 +8,11 @@ using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Platforma.Application.Files
 {
-    public class DownloadAssignmentFile
+    public class DownloadAnswerFile
     {
         public class Query : IRequest<Result<FileContentResult>>
         {
-            public Guid AssignmentId { get; set; }
+            public Guid AnswerId { get; set; }
         }
 
         public class Handler : IRequestHandler<Query, Result<FileContentResult>>
@@ -27,19 +27,19 @@ namespace Platforma.Application.Files
             }
             public async Task<Result<FileContentResult>> Handle(Query request, CancellationToken cancellationToken)
             {
-                var assignment = await _context.Assignments.FindAsync(request.AssignmentId);
-                if (assignment == null)
+                var answer = await _context.Answers.FindAsync(request.AnswerId);
+                if (answer == null)
                 {
-                    return Result<FileContentResult>.Failure("Assignment not found");
+                    return Result<FileContentResult>.Failure("Answer not found");
                 }
-                if (assignment.FilePath == null)
+                if (answer.FilePath == null)
                 {
-                    return Result<FileContentResult>.Failure("No file uploaded for assignment");
+                    return Result<FileContentResult>.Failure("No file uploaded for answer");
                 }
 
                 // Create file path to assignment file
                 string uploadPath = _configuration["FileStorageConfig:Path"]!;
-                string fullPath = Path.Combine(uploadPath, assignment.FilePath);
+                string fullPath = Path.Combine(uploadPath, answer.FilePath);
 
                 // Try to send back the file
                 try
@@ -69,7 +69,7 @@ namespace Platforma.Application.Files
                         }
                         return Result<FileContentResult>.Failure("Failed to retrive file");
                     }
-                }   
+                }
                 catch
                 {
                     return Result<FileContentResult>.Failure("Error retrieving file");

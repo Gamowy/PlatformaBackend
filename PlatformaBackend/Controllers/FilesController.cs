@@ -44,6 +44,19 @@ namespace PlatformaBackend.Controllers
             return BadRequest(result.Error);
         }
 
+        [HttpGet("answers/{id}")]
+        public async Task<IActionResult> DownloadAnswer(Guid id)
+        {
+            var result = await Mediator.Send(new DownloadAnswerFile.Query { AnswerId = id });
+            if (result == null)
+                return NotFound();
+            if (result.IsSuccess && result.Value != null)
+                return result.Value;
+            if (result.IsSuccess && result.Value == null)
+                return NotFound();
+            return BadRequest(result.Error);
+        }
+
         [HttpPost("answers")]
         public async Task<IActionResult> UploadAnswer(AnswerUploadDTO answerUploadDTO)
         {
