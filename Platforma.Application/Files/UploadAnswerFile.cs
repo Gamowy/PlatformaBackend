@@ -76,7 +76,7 @@ namespace Platforma.Application.Files
                     return Result<Unit?>.Failure("Course or assignment not found.");
                 }
                 string uploadPath = _configuration["FileStorageConfig:Path"]!;
-                string filePath = $"answers/{courseId}/{assignmentId}/{Guid.NewGuid().ToString()}_{request.File.FileName}";
+                string filePath = $"{courseId}/answers/{assignmentId}/{answer.Id}/{Guid.NewGuid().ToString()}_{request.File.FileName}";
                 string fullPath = Path.Combine(uploadPath, filePath);
 
                 // Save file

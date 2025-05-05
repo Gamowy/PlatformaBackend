@@ -1,11 +1,6 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Configuration;
 using Platforma.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Platforma.Application.Files
 {
@@ -33,7 +28,7 @@ namespace Platforma.Application.Files
                 if (assignment == null)
                 {
                     return Result<Unit?>.Failure("Assignment not found");
-                } 
+                }
                 string uploadPath = _configuration["FileStorageConfig:Path"]!;
                 string filePath = assignment.FilePath;
                 string fullPath = Path.Combine(uploadPath, filePath);

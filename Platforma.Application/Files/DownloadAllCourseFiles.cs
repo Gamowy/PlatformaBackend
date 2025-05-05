@@ -1,16 +1,16 @@
-﻿using HeyRed.Mime;
-using MediatR;
+﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Platforma.Infrastructure;
+using System.IO.Compression;
 
 namespace Platforma.Application.Files
 {
-    public class DownloadAssignmentFile
+    public class DownloadAllCourseFiles
     {
         public class Query : IRequest<Result<FileContentResult>>
         {
-            public Guid AssignmentId { get; set; }
+            public Guid CourseId { get; set; }
         }
 
         public class Handler : IRequestHandler<Query, Result<FileContentResult>>
@@ -25,32 +25,34 @@ namespace Platforma.Application.Files
             }
             public async Task<Result<FileContentResult>> Handle(Query request, CancellationToken cancellationToken)
             {
-                var assignment = await _context.Assignments.FindAsync(request.AssignmentId);
-                if (assignment == null)
+                var course = await _context.Courses.FindAsync(request.CourseId);
+                if (course == null)
                 {
-                    return Result<FileContentResult>.Failure("Assignment not found");
-                }
-                if (assignment.FilePath == null)
-                {
-                    return Result<FileContentResult>.Failure("No file uploaded for assignment");
+                    return Result<FileContentResult>.Failure("Answer not found");
                 }
 
-                // Create file path to assignment file
+                // Create file path to course files
                 string uploadPath = _configuration["FileStorageConfig:Path"]!;
-                string fullPath = Path.Combine(uploadPath, assignment.FilePath);
+                string coursePath = course.Id.ToString();
+                string fullPath = Path.Combine(uploadPath, coursePath);
 
-                // Try to send back the file
+                // Try to send back course files
                 try
                 {
-                    if (!File.Exists(fullPath))
+                    if (!Directory.Exists(fullPath))
                     {
-                        return Result<FileContentResult>.Failure("File not found");
+                        return Result<FileContentResult>.Failure("Course files not found");
                     }
-                    var mimeType = MimeTypesMap.GetMimeType(fullPath);
+                    // Create the ZIP file
+                    var zipPath = Path.Combine(uploadPath, $"{course.Name}.zip");
+                    DeleteZip(zipPath);
+                    ZipFile.CreateFromDirectory(fullPath, zipPath, CompressionLevel.Fastest, true);
+
+                    var mimeType = "application/zip";
                     byte[]? fileBytes;
 
                     // Retrieve file
-                    using (var stream = new FileStream(fullPath, FileMode.Open))
+                    using (var stream = new FileStream(zipPath, FileMode.Open))
                     {
                         using (var memoryStream = new MemoryStream())
                         {
@@ -61,16 +63,28 @@ namespace Platforma.Application.Files
                         {
                             var file = new FileContentResult(fileBytes, mimeType)
                             {
-                                FileDownloadName = Path.GetFileName(fullPath).Substring(37)
+                                FileDownloadName = Path.GetFileName(zipPath)
                             };
                             return Result<FileContentResult>.Success(file);
                         }
-                        return Result<FileContentResult>.Failure("Failed to retrive file");
+                        return Result<FileContentResult>.Failure("Failed to retrive course files");
                     }
                 }
                 catch
                 {
-                    return Result<FileContentResult>.Failure("Error retrieving file");
+                    return Result<FileContentResult>.Failure("Error retrieving course files");
+                }
+                finally
+                {
+                    DeleteZip(Path.Combine(uploadPath, $"{course.Name}.zip"));
+                }
+            }
+
+            private void DeleteZip(string zipPath)
+            {
+                if (File.Exists(zipPath))
+                {
+                    File.Delete(zipPath);
                 }
             }
         }

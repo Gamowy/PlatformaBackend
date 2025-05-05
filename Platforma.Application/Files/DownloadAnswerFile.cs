@@ -1,10 +1,8 @@
-﻿using MediatR;
-using Microsoft.AspNetCore.Http;
+﻿using HeyRed.Mime;
+using MediatR;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Platforma.Infrastructure;
-using HeyRed.Mime;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Platforma.Application.Files
 {

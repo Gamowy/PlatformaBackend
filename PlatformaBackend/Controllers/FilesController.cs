@@ -21,7 +21,7 @@ namespace PlatformaBackend.Controllers
         [HttpPut("assignments/{id}")]
         public async Task<IActionResult> UploadAssignment(Guid id, IFormFile file)
         {
-            var result = await Mediator.Send(new UploadAssignmentFile.Command { AssignmentId = id, File = file});
+            var result = await Mediator.Send(new UploadAssignmentFile.Command { AssignmentId = id, File = file });
             if (result == null)
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
@@ -78,6 +78,19 @@ namespace PlatformaBackend.Controllers
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
                 return Ok(result.Value);
+            if (result.IsSuccess && result.Value == null)
+                return NotFound();
+            return BadRequest(result.Error);
+        }
+
+        [HttpGet("course/{id}")]
+        public async Task<IActionResult> DownloadCourse(Guid id)
+        {
+            var result = await Mediator.Send(new DownloadAllCourseFiles.Query { CourseId = id });
+            if (result == null)
+                return NotFound();
+            if (result.IsSuccess && result.Value != null)
+                return result.Value;
             if (result.IsSuccess && result.Value == null)
                 return NotFound();
             return BadRequest(result.Error);
