@@ -94,7 +94,7 @@ namespace Platforma.Application.Files
                     var result = await _context.SaveChangesAsync() > 0;
                     if (!result)
                     {
-                        throw new Exception();
+                        throw new Exception("Failed to save file path refrence in database");
                     }
                 }
                 catch (Exception ex)
@@ -115,9 +115,9 @@ namespace Platforma.Application.Files
                         File.Delete(fullPath);
                     }
                 }
-                catch (Exception ex)
+                catch
                 {
-                    Console.WriteLine($"Error deleting file: {ex.Message}");
+                    Console.WriteLine($"Error deleting file durign rollback");
                 }
             }
         }

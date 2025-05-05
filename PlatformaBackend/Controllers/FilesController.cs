@@ -5,6 +5,19 @@ namespace PlatformaBackend.Controllers
 {
     public class FilesController : BaseAPIController
     {
+        [HttpGet("assignments/{id}")]
+        public async Task<IActionResult> DownloadAssignment(Guid id)
+        {
+            var result = await Mediator.Send(new DownloadAssignmentFile.Query { AssignmentId = id });
+            if (result == null)
+                return NotFound();
+            if (result.IsSuccess && result.Value != null)
+                return result.Value;
+            if (result.IsSuccess && result.Value == null)
+                return NotFound();
+            return BadRequest(result.Error);
+        }
+
         [HttpPost("assignments")]
         public async Task<IActionResult> UploadAssignment(AssignmentUploadDTO assignmentUploadDTO)
         {
@@ -12,7 +25,7 @@ namespace PlatformaBackend.Controllers
             if (result == null)
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
-                return Ok(result.Value);
+                return Ok();
             if (result.IsSuccess && result.Value == null)
                 return NotFound();
             return BadRequest(result.Error);
