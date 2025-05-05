@@ -37,6 +37,7 @@ namespace Platforma.Application.Files
                 string fullPath = Path.Combine(uploadPath, coursePath);
 
                 // Try to send back course files
+                var zipPath = Path.Combine(uploadPath, $"{Guid.NewGuid().ToString()}_{course.Name}.zip");
                 try
                 {
                     if (!Directory.Exists(fullPath))
@@ -44,7 +45,6 @@ namespace Platforma.Application.Files
                         return Result<FileContentResult>.Failure("Course files not found");
                     }
                     // Create the ZIP file
-                    var zipPath = Path.Combine(uploadPath, $"{course.Name}.zip");
                     DeleteZip(zipPath);
                     ZipFile.CreateFromDirectory(fullPath, zipPath, CompressionLevel.Fastest, true);
 
@@ -63,7 +63,7 @@ namespace Platforma.Application.Files
                         {
                             var file = new FileContentResult(fileBytes, mimeType)
                             {
-                                FileDownloadName = Path.GetFileName(zipPath)
+                                FileDownloadName = Path.GetFileName(zipPath).Substring(37)
                             };
                             return Result<FileContentResult>.Success(file);
                         }
@@ -76,7 +76,7 @@ namespace Platforma.Application.Files
                 }
                 finally
                 {
-                    DeleteZip(Path.Combine(uploadPath, $"{course.Name}.zip"));
+                    DeleteZip(zipPath);
                 }
             }
 

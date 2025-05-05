@@ -51,7 +51,7 @@ namespace Platforma.Application.Files
                 // Create file path 
                 string uploadPath = _configuration["FileStorageConfig:Path"]!;
 
-                string filePath = $"{assignment.CourseId}/assignments/{assignment.Id}/{Guid.NewGuid().ToString()}_{request.File.FileName}";
+                string filePath = $"{assignment.CourseId}/assignments/{assignment.Id}/{Guid.NewGuid().ToString()}_{Path.GetFileName(request.File.FileName)}";
                 string fullPath = Path.Combine(uploadPath, filePath);
 
                 // Save file
