@@ -11,6 +11,7 @@ using Microsoft.OpenApi.Models;
 using FluentValidation.AspNetCore;
 using FluentValidation;
 using Platforma.Application.Users;
+using Platforma.Domain;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -44,7 +45,16 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         };
     });
 
+builder.Services.AddAuthorization(options =>
+{
+    options.AddPolicy("AdminOrTeacher",
+         policy => policy.RequireRole(User.Roles.Administrator, User.Roles.Teacher));
+    options.AddPolicy("NotAdmin",
+         policy => policy.RequireRole(User.Roles.Teacher, User.Roles.Student));
+});
+
 builder.Services.AddAuthorization();
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddControllers();
 builder.Services.AddFluentValidationAutoValidation(); 
