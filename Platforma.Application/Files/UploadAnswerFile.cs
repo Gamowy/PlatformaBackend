@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Platforma.Infrastructure;
 using System;
@@ -13,7 +14,8 @@ namespace Platforma.Application.Files
     {
         public class Command : IRequest<Result<Unit?>>
         {
-            public required AnswerUploadDTO AnswerUploadDTO { get; set; }
+            public required Guid AnswerId;
+            public required IFormFile File;
         }
 
         public class Handler : IRequestHandler<Command, Result<Unit?>>
@@ -29,7 +31,7 @@ namespace Platforma.Application.Files
 
             public async Task<Result<Unit?>> Handle(Command request, CancellationToken cancellationToken)
             {
-                var answer = await _context.Answers.FindAsync(request.AnswerUploadDTO.AnswerId);
+                var answer = await _context.Answers.FindAsync(request.AnswerId);
                 if (answer == null)
                 {
                     return Result<Unit?>.Failure("Answer not found");
@@ -40,20 +42,20 @@ namespace Platforma.Application.Files
                 }
 
                 // Check file size
-                if (request.AnswerUploadDTO.File.Length > 1000 * 1024 * 1024) // ~ 1GB
+                if (request.File.Length > 1000 * 1024 * 1024) // ~ 1GB
                 {
                     return Result<Unit?>.Failure("File size exceeds the limit");
                 }
 
                 // Check file type
                 var acceptedFileTypes = _context.Assignments
-                    .Where(a => a.Answers.Any(ans => ans.Id == request.AnswerUploadDTO.AnswerId))
+                    .Where(a => a.Answers.Any(ans => ans.Id == request.AnswerId))
                     .Select(a => a.AcceptedFileTypes)
                     .FirstOrDefault();
                 if (acceptedFileTypes != null)
                 {
                     List<string> acceptedFileTypesList = acceptedFileTypes.Split(';').ToList();
-                    string fileExtension = Path.GetExtension(request.AnswerUploadDTO.File.FileName);
+                    string fileExtension = Path.GetExtension(request.File.FileName);
                     if (!acceptedFileTypesList.Contains(fileExtension))
                     {
                         return Result<Unit?>.Failure("File type not accepted");
@@ -62,11 +64,11 @@ namespace Platforma.Application.Files
 
                 // Create file path 
                 var courseId = _context.Assignments
-                    .Where(a => a.Answers.Any(ans => ans.Id == request.AnswerUploadDTO.AnswerId))
+                    .Where(a => a.Answers.Any(ans => ans.Id == request.AnswerId))
                     .Select(a => a.CourseId)
                     .FirstOrDefault();
                 var assignmentId = _context.Assignments
-                    .Where(a => a.Answers.Any(ans => ans.Id == request.AnswerUploadDTO.AnswerId))
+                    .Where(a => a.Answers.Any(ans => ans.Id == request.AnswerId))
                     .Select(a => a.Id)
                     .FirstOrDefault();
                 if (courseId == Guid.Empty || assignmentId == Guid.Empty)
@@ -74,7 +76,7 @@ namespace Platforma.Application.Files
                     return Result<Unit?>.Failure("Course or assignment not found.");
                 }
                 string uploadPath = _configuration["FileStorageConfig:Path"]!;
-                string filePath = $"answers/{courseId}/{assignmentId}/{Guid.NewGuid().ToString()}_{request.AnswerUploadDTO.File.FileName}";
+                string filePath = $"answers/{courseId}/{assignmentId}/{Guid.NewGuid().ToString()}_{request.File.FileName}";
                 string fullPath = Path.Combine(uploadPath, filePath);
 
                 // Save file
@@ -86,7 +88,7 @@ namespace Platforma.Application.Files
                     // Save file to storage
                     using (var stream = new FileStream(fullPath, FileMode.Create))
                     {
-                        await request.AnswerUploadDTO.File.CopyToAsync(stream);
+                        await request.File.CopyToAsync(stream);
                     }
                     // Save file path reference in database
                     answer.FilePath = filePath;

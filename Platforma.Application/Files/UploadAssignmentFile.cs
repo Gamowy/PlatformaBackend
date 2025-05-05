@@ -15,7 +15,8 @@ namespace Platforma.Application.Files
     {
         public class Command : IRequest<Result<Unit?>>
         {
-            public required AssignmentUploadDTO AssignmentUploadDTO { get; set; }
+            public required Guid AssignmentId;
+            public required IFormFile File;
         }
 
         public class Handler : IRequestHandler<Command, Result<Unit?>>
@@ -31,7 +32,7 @@ namespace Platforma.Application.Files
 
             public async Task<Result<Unit?>> Handle(Command request, CancellationToken cancellationToken)
             {
-                var assignment = _context.Assignments.Find(request.AssignmentUploadDTO.AssignmentId);
+                var assignment = _context.Assignments.Find(request.AssignmentId);
                 if (assignment == null)
                 {
                     return Result<Unit?>.Failure("Assignment not found");
@@ -42,7 +43,7 @@ namespace Platforma.Application.Files
                 }
 
                 // Check file size
-                if (request.AssignmentUploadDTO.File.Length > 1000 * 1024 * 1024) // ~ 1GB
+                if (request.File.Length > 1000 * 1024 * 1024) // ~ 1GB
                 {
                     return Result<Unit?>.Failure("File size exceeds the limit");
                 }
@@ -50,7 +51,7 @@ namespace Platforma.Application.Files
                 // Create file path 
                 string uploadPath = _configuration["FileStorageConfig:Path"]!;
 
-                string filePath = $"assignments/{assignment.CourseId}/{Guid.NewGuid().ToString()}_{request.AssignmentUploadDTO.File.FileName}";
+                string filePath = $"assignments/{assignment.CourseId}/{Guid.NewGuid().ToString()}_{request.File.FileName}";
                 string fullPath = Path.Combine(uploadPath, filePath);
 
                 // Save file
@@ -62,7 +63,7 @@ namespace Platforma.Application.Files
                     // Save file to storage
                     using (var stream = new FileStream(fullPath, FileMode.Create))
                     {
-                        await request.AssignmentUploadDTO.File.CopyToAsync(stream);
+                        await request.File.CopyToAsync(stream);
                     }
                     // Save file path reference in database
                     assignment.FilePath = filePath;

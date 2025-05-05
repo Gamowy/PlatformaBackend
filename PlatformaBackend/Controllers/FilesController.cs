@@ -18,10 +18,10 @@ namespace PlatformaBackend.Controllers
             return BadRequest(result.Error);
         }
 
-        [HttpPost("assignments")]
-        public async Task<IActionResult> UploadAssignment(AssignmentUploadDTO assignmentUploadDTO)
+        [HttpPut("assignments/{id}")]
+        public async Task<IActionResult> UploadAssignment(Guid id, IFormFile file)
         {
-            var result = await Mediator.Send(new UploadAssignmentFile.Command { AssignmentUploadDTO = assignmentUploadDTO });
+            var result = await Mediator.Send(new UploadAssignmentFile.Command { AssignmentId = id, File = file});
             if (result == null)
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
@@ -57,10 +57,10 @@ namespace PlatformaBackend.Controllers
             return BadRequest(result.Error);
         }
 
-        [HttpPost("answers")]
-        public async Task<IActionResult> UploadAnswer(AnswerUploadDTO answerUploadDTO)
+        [HttpPut("answers/{id}")]
+        public async Task<IActionResult> UploadAnswer(Guid id, IFormFile file)
         {
-            var result = await Mediator.Send(new UploadAnswerFile.Command { AnswerUploadDTO = answerUploadDTO });
+            var result = await Mediator.Send(new UploadAnswerFile.Command { AnswerId = id, File = file });
             if (result == null)
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
