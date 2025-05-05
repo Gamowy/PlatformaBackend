@@ -28,7 +28,7 @@ namespace Platforma.Application.Files
                 var course = await _context.Courses.FindAsync(request.CourseId);
                 if (course == null)
                 {
-                    return Result<FileContentResult>.Failure("Answer not found");
+                    return Result<FileContentResult>.Failure("Course not found");
                 }
 
                 // Create file path to course files
