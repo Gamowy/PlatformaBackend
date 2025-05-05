@@ -30,5 +30,31 @@ namespace PlatformaBackend.Controllers
                 return NotFound();
             return BadRequest(result.Error);
         }
+
+        [HttpPost("answers")]
+        public async Task<IActionResult> UploadAnswer(AnswerUploadDTO answerUploadDTO)
+        {
+            var result = await Mediator.Send(new UploadAnswerFile.Command { AnswerUploadDTO = answerUploadDTO });
+            if (result == null)
+                return NotFound();
+            if (result.IsSuccess && result.Value != null)
+                return Ok(result.Value);
+            if (result.IsSuccess && result.Value == null)
+                return NotFound();
+            return BadRequest(result.Error);
+        }
+
+        [HttpDelete("answers/{id}")]
+        public async Task<IActionResult> DeleteAnswer(Guid id)
+        {
+            var result = await Mediator.Send(new DeleteAnswerFile.Command { AnswerId = id });
+            if (result == null)
+                return NotFound();
+            if (result.IsSuccess && result.Value != null)
+                return Ok(result.Value);
+            if (result.IsSuccess && result.Value == null)
+                return NotFound();
+            return BadRequest(result.Error);
+        }
     }
 }

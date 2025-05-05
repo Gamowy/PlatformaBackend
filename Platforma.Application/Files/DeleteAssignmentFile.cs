@@ -38,7 +38,6 @@ namespace Platforma.Application.Files
                 string filePath = assignment.FilePath;
                 string fullPath = Path.Combine(uploadPath, filePath);
 
-
                 // Clear file path reference in database
                 assignment.FilePath = "";
                 var result = await _context.SaveChangesAsync(cancellationToken) > 0;
@@ -53,6 +52,5 @@ namespace Platforma.Application.Files
                 return Result<Unit?>.Success(Unit.Value);
             }
         }
-
     }
 }

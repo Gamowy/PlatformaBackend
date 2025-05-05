@@ -77,8 +77,8 @@ namespace Platforma.Infrastructure
                 Course = testCourse,
                 OpenDate = DateTime.Now.AddDays(-3),
                 Deadline = DateTime.Now.AddDays(4),
-                FilePath = "???",
-                AcceptedFileTypes = ".zip;.pdf;.docx"
+                FilePath = "",
+                AcceptedFileTypes = ".zip;.pdf;.docx.;.txt"
             };
 
             await dataContext.Assignments.AddAsync(assignment);
@@ -100,7 +100,7 @@ namespace Platforma.Infrastructure
                 Assignment = testAssignment,
                 User = testUser,
                 SubmittedDate = DateTime.Now,
-                FilePath = "???"
+                FilePath = ""
             };
 
             await dataContext.AddAsync(answer);
