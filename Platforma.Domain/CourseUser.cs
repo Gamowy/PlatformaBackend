@@ -12,6 +12,6 @@ namespace Platforma.Domain
     {
         public Guid CourseID { get; set; }
         public Guid UserID { get; set; }
-        public UserStatus Status { get; set; }
+        public UserStatus? Status { get; set; } = 0;
     }
 }
