@@ -1,11 +1,23 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Platforma.Application.Answers;
+using Platforma.Application.Assignments;
 using Platforma.Application.Files;
+using Platforma.Domain;
+using System.Security.Claims;
 
 namespace PlatformaBackend.Controllers
 {
     public class FilesController : BaseAPIController
     {
-        [HttpGet("file/{assignmentId}")]
+        private readonly IHttpContextAccessor _HttpContextAccessor;
+        public FilesController(IHttpContextAccessor httpContextAccessor)
+        {
+            _HttpContextAccessor = httpContextAccessor;
+        }
+
+        #region Assignments
+        [HttpGet("assignments/{assignmentId}")]
         public async Task<IActionResult> DownloadAssignmentFile(Guid assignmentId)
         {
             var result = await Mediator.Send(new DownloadAssignmentFile.Query { AssignmentId = assignmentId });
@@ -18,7 +30,7 @@ namespace PlatformaBackend.Controllers
             return BadRequest(result.Error);
         }
 
-        [HttpPut("file/{assignmentId}")]
+        [HttpPut("assignments/{assignmentId}")]
         public async Task<IActionResult> UploadAssignmentFile(Guid assignmentId, IFormFile file)
         {
             var result = await Mediator.Send(new UploadAssignmentFile.Command { AssignmentId = assignmentId, File = file });
@@ -31,7 +43,7 @@ namespace PlatformaBackend.Controllers
             return BadRequest(result.Error);
         }
 
-        [HttpDelete("file/{assignmentId}")]
+        [HttpDelete("assignments/{assignmentId}")]
         public async Task<IActionResult> RemoveAssignmentFile(Guid assignmentId)
         {
             var result = await Mediator.Send(new RemoveAssignmentFile.Command { AssignmentId = assignmentId });
@@ -43,11 +55,13 @@ namespace PlatformaBackend.Controllers
                 return NotFound();
             return BadRequest(result.Error);
         }
+        #endregion
 
-        [HttpGet("answers/{id}")]
-        public async Task<IActionResult> DownloadAnswer(Guid id)
+        #region Answers
+        [HttpGet("answers/{answerId}")]
+        public async Task<IActionResult> DownloadAnswer(Guid answerId)
         {
-            var result = await Mediator.Send(new DownloadAnswerFile.Query { AnswerId = id });
+            var result = await Mediator.Send(new DownloadAnswerFile.Query { AnswerId = answerId });
             if (result == null)
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
@@ -57,10 +71,11 @@ namespace PlatformaBackend.Controllers
             return BadRequest(result.Error);
         }
 
-        [HttpPut("answers/{id}")]
-        public async Task<IActionResult> UploadAnswer(Guid id, IFormFile file)
+        [HttpPost("answers")]
+        public async Task<IActionResult> UploadAnswer(Guid assignmentId, IFormFile file)
         {
-            var result = await Mediator.Send(new UploadAnswerFile.Command { AnswerId = id, File = file });
+            var userId = Guid.Parse(_HttpContextAccessor.HttpContext!.User.FindFirst("UserId")!.Value);
+            var result = await Mediator.Send(new UploadAnswerFile.Command { UserId = userId, AssignmentId = assignmentId, File = file });
             if (result == null)
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
@@ -70,10 +85,10 @@ namespace PlatformaBackend.Controllers
             return BadRequest(result.Error);
         }
 
-        [HttpDelete("answers/{id}")]
-        public async Task<IActionResult> DeleteAnswer(Guid id)
+        [HttpDelete("answers/{answerId}")]
+        public async Task<IActionResult> DeleteAnswer(Guid answerId)
         {
-            var result = await Mediator.Send(new DeleteAnswerFile.Command { AnswerId = id });
+            var result = await Mediator.Send(new DeleteAnswerFile.Command { AnswerId = answerId });
             if (result == null)
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
@@ -82,11 +97,13 @@ namespace PlatformaBackend.Controllers
                 return NotFound();
             return BadRequest(result.Error);
         }
+        #endregion
 
-        [HttpGet("course/{id}")]
-        public async Task<IActionResult> DownloadCourse(Guid id)
+        #region Course
+        [HttpGet("course/{courseId}")]
+        public async Task<IActionResult> DownloadCourse(Guid courseId)
         {
-            var result = await Mediator.Send(new DownloadAllCourseFiles.Query { CourseId = id });
+            var result = await Mediator.Send(new DownloadAllCourseFiles.Query { CourseId = courseId });
             if (result == null)
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
@@ -95,5 +112,6 @@ namespace PlatformaBackend.Controllers
                 return NotFound();
             return BadRequest(result.Error);
         }
+        #endregion
     }
 }

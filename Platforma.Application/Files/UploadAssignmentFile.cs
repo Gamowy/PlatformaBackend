@@ -32,7 +32,7 @@ namespace Platforma.Application.Files
 
             public async Task<Result<Unit?>> Handle(Command request, CancellationToken cancellationToken)
             {
-                var assignment = _context.Assignments.Find(request.AssignmentId);
+                var assignment = await _context.Assignments.FindAsync(request.AssignmentId);
                 if (assignment == null)
                 {
                     return Result<Unit?>.Failure("Assignment not found");

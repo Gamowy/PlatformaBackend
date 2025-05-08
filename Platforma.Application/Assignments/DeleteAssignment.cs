@@ -1,11 +1,5 @@
 ﻿using MediatR;
-using Platforma.Domain;
 using Platforma.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Platforma.Application.Assignments
 {
@@ -13,7 +7,6 @@ namespace Platforma.Application.Assignments
     {
         public class Command : IRequest<Result<Unit?>>
         {
-            public required Guid CourseId { get; set; }
             public required Guid AssignmentId { get; set; }
         }
 
@@ -26,8 +19,6 @@ namespace Platforma.Application.Assignments
             }
             public async Task<Result<Unit?>> Handle(Command request, CancellationToken cancellationToken)
             {
-                var course = await _context.Courses.FindAsync(request.CourseId);
-                if (course == null) return Result<Unit?>.Failure("Course not found.");
                 var assignment = await _context.Assignments.FindAsync(request.AssignmentId);
                 if (assignment == null) return Result<Unit?>.Failure("Assignment not found.");
                 _context.Assignments.Remove(assignment);

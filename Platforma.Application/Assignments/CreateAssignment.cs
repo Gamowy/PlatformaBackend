@@ -1,11 +1,7 @@
 ﻿using MediatR;
+using Platforma.Application.Assignments.DTO;
 using Platforma.Domain;
 using Platforma.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Platforma.Application.Assignments
 {
@@ -13,8 +9,7 @@ namespace Platforma.Application.Assignments
     {
         public class Command : IRequest<Result<Unit?>>
         {
-            public required Guid CourseId { get; set; }
-            public required AssignmentDTO AssignmentDTO { get; set; }
+            public required AssignmentDTORequest AssignmentDTO { get; set; }
         }
 
         public class Handler : IRequestHandler<Command, Result<Unit?>>
@@ -26,13 +21,13 @@ namespace Platforma.Application.Assignments
             }
             public async Task<Result<Unit?>> Handle(Command request, CancellationToken cancellationToken)
             {
-                var course = await _context.Courses.FindAsync(request.CourseId);
+                var course = await _context.Courses.FindAsync(request.AssignmentDTO.CourseId);
                 if (course == null) return Result<Unit?>.Failure("Course not found.");
-                if (request.CourseId != request.AssignmentDTO.CourseId) return Result<Unit?>.Failure("Incorrect courseId.");
+                if (request.AssignmentDTO.CourseId != request.AssignmentDTO.CourseId) return Result<Unit?>.Failure("Incorrect courseId.");
 
                 var assignment = new Assignment
                 {
-                    CourseId = request.CourseId,
+                    CourseId = request.AssignmentDTO.CourseId,
                     Name = request.AssignmentDTO.AssignmentName ?? "New assignment",
                     Content = request.AssignmentDTO.AssignmentContent ?? "Assigment description",
                     OpenDate = DateTime.Now,

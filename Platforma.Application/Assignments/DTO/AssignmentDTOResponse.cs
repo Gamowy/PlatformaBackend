@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Platforma.Application.Assignments
+namespace Platforma.Application.Assignments.DTO
 {
-    public class AssignmentDTO
+    public class AssignmentDTOResponse
     {
         public Guid Id { get; set; }
         public Guid CourseId { get; set; }
@@ -14,7 +14,6 @@ namespace Platforma.Application.Assignments
         public string? AssignmentContent { get; set; }
         public DateTime? OpenDate { get; set; }
         public DateTime? Deadline { get; set; }
-        public string? FilePath { get; set; }
         public string? AcceptedFileTypes { get; set; }
     }
 }

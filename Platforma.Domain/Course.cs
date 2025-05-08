@@ -15,7 +15,6 @@ namespace Platforma.Domain
         public Guid OwnerId { get; set; }
         public User? Owner { get; set; }
         public string AcademicYear { get; set; }
-
         public List<Assignment>? Assignments { get; set; }
     }
 }

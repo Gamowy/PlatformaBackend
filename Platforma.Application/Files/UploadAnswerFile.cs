@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
+using Platforma.Domain;
 using Platforma.Infrastructure;
 using System;
 using System.Collections.Generic;
@@ -14,7 +15,8 @@ namespace Platforma.Application.Files
     {
         public class Command : IRequest<Result<Unit?>>
         {
-            public required Guid AnswerId;
+            public required Guid AssignmentId;
+            public required Guid UserId;
             public required IFormFile File;
         }
 
@@ -31,15 +33,18 @@ namespace Platforma.Application.Files
 
             public async Task<Result<Unit?>> Handle(Command request, CancellationToken cancellationToken)
             {
-                var answer = await _context.Answers.FindAsync(request.AnswerId);
-                if (answer == null)
-                {
-                    return Result<Unit?>.Failure("Answer not found");
-                }
-                if (!string.IsNullOrEmpty(answer.FilePath))
-                {
-                    return Result<Unit?>.Failure("File already uploaded");
-                }
+                var assignment = await _context.Assignments.FindAsync(request.AssignmentId);
+                if (assignment == null) return Result<Unit?>.Failure("Assignment not found");
+                
+                var user = await _context.Users.FindAsync(request.UserId);
+                if (user == null) return Result<Unit?>.Failure("User not found");
+
+                // Check if answer for specified user and specified assigmnent is already submited
+                var answer = _context.Answers
+                    .Where(a => a.AssignmentId == request.AssignmentId && a.UserId == request.UserId)
+                    .FirstOrDefault();
+                if (answer != null) return Result<Unit?>.Failure("Answer already submitted");
+
 
                 // Check file size
                 if (request.File.Length > 1000 * 1024 * 1024) // ~ 1GB
@@ -48,10 +53,7 @@ namespace Platforma.Application.Files
                 }
 
                 // Check file type
-                var acceptedFileTypes = _context.Assignments
-                    .Where(a => a.Answers.Any(ans => ans.Id == request.AnswerId))
-                    .Select(a => a.AcceptedFileTypes)
-                    .FirstOrDefault();
+                var acceptedFileTypes = assignment.AcceptedFileTypes;
                 if (acceptedFileTypes != null)
                 {
                     List<string> acceptedFileTypesList = acceptedFileTypes.Split(';').ToList();
@@ -62,21 +64,20 @@ namespace Platforma.Application.Files
                     }
                 }
 
+                // Create answer entry
+                var newAnswer = new Answer
+                {
+                    AssignmentId = request.AssignmentId,
+                    UserId = request.UserId,
+                };
+
                 // Create file path 
-                var courseId = _context.Assignments
-                    .Where(a => a.Answers.Any(ans => ans.Id == request.AnswerId))
-                    .Select(a => a.CourseId)
-                    .FirstOrDefault();
-                var assignmentId = _context.Assignments
-                    .Where(a => a.Answers.Any(ans => ans.Id == request.AnswerId))
-                    .Select(a => a.Id)
-                    .FirstOrDefault();
-                if (courseId == Guid.Empty || assignmentId == Guid.Empty)
+                if (assignment.CourseId == Guid.Empty || assignment.Id == Guid.Empty)
                 {
                     return Result<Unit?>.Failure("Course or assignment not found.");
                 }
                 string uploadPath = _configuration["FileStorageConfig:Path"]!;
-                string filePath = $"{courseId}/answers/{assignmentId}/{answer.Id}/{Guid.NewGuid().ToString()}_{Path.GetFileName(request.File.FileName)}";
+                string filePath = $"{assignment.CourseId}/answers/{assignment.Id}/{newAnswer.Id}/{Guid.NewGuid().ToString()}_{Path.GetFileName(request.File.FileName)}";
                 string fullPath = Path.Combine(uploadPath, filePath);
 
                 // Save file
@@ -91,8 +92,9 @@ namespace Platforma.Application.Files
                         await request.File.CopyToAsync(stream);
                     }
                     // Save file path reference in database
-                    answer.FilePath = filePath;
-                    answer.SubmittedDate = DateTime.UtcNow;
+                    newAnswer.FilePath = filePath;
+                    newAnswer.SubmittedDate = DateTime.Now;
+                    _context.Answers.Add(newAnswer);
                     var result = await _context.SaveChangesAsync() > 0;
                     if (!result)
                     {

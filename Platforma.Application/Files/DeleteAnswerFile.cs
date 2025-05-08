@@ -6,7 +6,6 @@ namespace Platforma.Application.Files
 {
     public class DeleteAnswerFile
     {
-
         public class Command : IRequest<Result<Unit?>>
         {
             public required Guid AnswerId { get; set; }
@@ -34,9 +33,8 @@ namespace Platforma.Application.Files
                 string filePath = answer.FilePath;
                 string fullPath = Path.Combine(uploadPath, filePath);
 
-                // Clear file path reference in database
-                answer.FilePath = "";
-                var result = await _context.SaveChangesAsync(cancellationToken) > 0;
+               _context.Remove(answer);
+               var result = await _context.SaveChangesAsync() > 0;
 
                 // Delete file
                 Console.WriteLine(fullPath);
