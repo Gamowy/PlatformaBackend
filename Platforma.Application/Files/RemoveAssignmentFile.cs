@@ -4,7 +4,7 @@ using Platforma.Infrastructure;
 
 namespace Platforma.Application.Files
 {
-    public class DeleteAssignmentFile
+    public class RemoveAssignmentFile
     {
         public class Command : IRequest<Result<Unit?>>
         {

@@ -5,10 +5,10 @@ namespace PlatformaBackend.Controllers
 {
     public class FilesController : BaseAPIController
     {
-        [HttpGet("assignments/{id}")]
-        public async Task<IActionResult> DownloadAssignment(Guid id)
+        [HttpGet("file/{assignmentId}")]
+        public async Task<IActionResult> DownloadAssignmentFile(Guid assignmentId)
         {
-            var result = await Mediator.Send(new DownloadAssignmentFile.Query { AssignmentId = id });
+            var result = await Mediator.Send(new DownloadAssignmentFile.Query { AssignmentId = assignmentId });
             if (result == null)
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
@@ -18,23 +18,23 @@ namespace PlatformaBackend.Controllers
             return BadRequest(result.Error);
         }
 
-        [HttpPut("assignments/{id}")]
-        public async Task<IActionResult> UploadAssignment(Guid id, IFormFile file)
+        [HttpPut("file/{assignmentId}")]
+        public async Task<IActionResult> UploadAssignmentFile(Guid assignmentId, IFormFile file)
         {
-            var result = await Mediator.Send(new UploadAssignmentFile.Command { AssignmentId = id, File = file });
+            var result = await Mediator.Send(new UploadAssignmentFile.Command { AssignmentId = assignmentId, File = file });
             if (result == null)
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
-                return Ok();
+                return Ok(result.Value);
             if (result.IsSuccess && result.Value == null)
                 return NotFound();
             return BadRequest(result.Error);
         }
 
-        [HttpDelete("assignments/{id}")]
-        public async Task<IActionResult> DeleteAssignment(Guid id)
+        [HttpDelete("file/{assignmentId}")]
+        public async Task<IActionResult> RemoveAssignmentFile(Guid assignmentId)
         {
-            var result = await Mediator.Send(new DeleteAssignmentFile.Command { AssignmentId = id });
+            var result = await Mediator.Send(new RemoveAssignmentFile.Command { AssignmentId = assignmentId });
             if (result == null)
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
