@@ -13,6 +13,7 @@ using FluentValidation;
 using Platforma.Application.Users;
 using Platforma.Domain;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Extensions.Options;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -89,6 +90,9 @@ builder.Services.AddSwaggerGen( c =>
             new string[]{ }
         } 
     });
+    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    c.IncludeXmlComments(xmlPath);
 });
 
 builder.Services.AddDbContext<DataContext>(opt =>

@@ -6,6 +6,9 @@ namespace PlatformaBackend.Controllers
 {
     public class AnswersController : BaseAPIController
     {
+        /// <summary>
+        /// Get a list of all answers for specified assignment
+        /// </summary>
         [HttpGet("{assignmentId}")]
         public async Task<ActionResult<List<AnswerDTOResponse>>> GetAllAnswers(Guid assignmentId)
         {
@@ -19,6 +22,9 @@ namespace PlatformaBackend.Controllers
             return BadRequest(result.Error);
         }
 
+        /// <summary>
+        /// Get details about specified answer
+        /// </summary>
         [HttpGet("details/{answerId}")]
         public async Task<ActionResult<AnswerDTOResponse>> GetAnswerDetails(Guid answerId)
         {
@@ -32,6 +38,9 @@ namespace PlatformaBackend.Controllers
             return BadRequest(result.Error);
         }
 
+        /// <summary>
+        /// Used to mark answers as teacher
+        /// </summary>
         [HttpPut("mark/{answerId}")]
         public async Task<IActionResult> MarkAnswer(Guid answerId, MarkAnswerDTO markAnswerDTO)
         {

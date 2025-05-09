@@ -19,6 +19,9 @@ namespace PlatformaBackend.Controllers
         }
 
 
+        /// <summary>
+        /// Get a list of all assignments for specified course
+        /// </summary>
         [HttpGet("{courseId}")]
         public async Task<ActionResult<List<AssignmentDTOResponse>>> GetAllAssignments(Guid courseId)
         {
@@ -32,6 +35,9 @@ namespace PlatformaBackend.Controllers
             return BadRequest(result.Error);
         }
 
+        /// <summary>
+        /// Get details about specified assignment
+        /// </summary>
         [HttpGet("details/{assignmentId}")]
         public async Task<ActionResult<AssignmentDTOResponse>> GetAssignmentDetails(Guid assignmentId)
         {
@@ -45,7 +51,9 @@ namespace PlatformaBackend.Controllers
             return BadRequest(result.Error);
         }
 
-        [Authorize(Policy = "AdminOrTeacher")]
+        /// <summary>
+        /// Create a new assignment for course
+        /// </summary>
         [HttpPost]
         public async Task<IActionResult> CreateNewAssignment(AssignmentDTORequest assignmentDTO)
         {
@@ -59,6 +67,9 @@ namespace PlatformaBackend.Controllers
             return BadRequest(result.Error);
         }
 
+        /// <summary>
+        /// Edit specified assignment
+        /// </summary>
         [HttpPut("details/{assignmentId}")]
         public async Task<IActionResult> EditAssignment(Guid assignmentId, AssignmentDTORequest assignmentDTO)
         {
@@ -72,6 +83,9 @@ namespace PlatformaBackend.Controllers
             return BadRequest(result.Error);
         }
 
+        /// <summary>
+        /// Delete specified assignment
+        /// </summary>
         [HttpDelete("details/{assignmentId}")]
         public async Task<IActionResult> DeleteAssignment(Guid assignmentId)
         {

@@ -9,6 +9,9 @@ namespace PlatformaBackend.Controllers
     [AllowAnonymous]
     public class AccountController : BaseAPIController
     {
+        /// <summary>
+        /// Used to login
+        /// </summary>
         [HttpPost("login")]
         public async Task<ActionResult<String?>> GetToken(UserLoginDTO userLoginDTO)
         {
@@ -22,6 +25,9 @@ namespace PlatformaBackend.Controllers
             return BadRequest(result.Error);
         }
 
+        /// <summary>
+        /// Used to register new user
+        /// </summary>
         [HttpPost("register")]
         public async Task<IActionResult> RegisterUser(UserRegisterDTO userRegisterDTO)
         {

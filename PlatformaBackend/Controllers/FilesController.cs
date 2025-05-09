@@ -17,6 +17,9 @@ namespace PlatformaBackend.Controllers
         }
 
         #region Assignments
+        /// <summary>
+        /// Download assignment file
+        /// </summary>
         [HttpGet("assignments/{assignmentId}")]
         public async Task<IActionResult> DownloadAssignmentFile(Guid assignmentId)
         {
@@ -30,6 +33,9 @@ namespace PlatformaBackend.Controllers
             return BadRequest(result.Error);
         }
 
+        /// <summary>
+        /// Upload assignment file
+        /// </summary>
         [HttpPut("assignments/{assignmentId}")]
         public async Task<IActionResult> UploadAssignmentFile(Guid assignmentId, IFormFile file)
         {
@@ -43,6 +49,9 @@ namespace PlatformaBackend.Controllers
             return BadRequest(result.Error);
         }
 
+        /// <summary>
+        /// Remove assignment file
+        /// </summary>
         [HttpDelete("assignments/{assignmentId}")]
         public async Task<IActionResult> RemoveAssignmentFile(Guid assignmentId)
         {
@@ -58,6 +67,9 @@ namespace PlatformaBackend.Controllers
         #endregion
 
         #region Answers
+        /// <summary>
+        /// Download specified answer file
+        /// </summary>
         [HttpGet("answers/{answerId}")]
         public async Task<IActionResult> DownloadAnswer(Guid answerId)
         {
@@ -71,6 +83,9 @@ namespace PlatformaBackend.Controllers
             return BadRequest(result.Error);
         }
 
+        /// <summary>
+        /// Upload new answer for assignment
+        /// </summary>
         [HttpPost("answers")]
         public async Task<IActionResult> UploadAnswer(Guid assignmentId, IFormFile file)
         {
@@ -85,6 +100,9 @@ namespace PlatformaBackend.Controllers
             return BadRequest(result.Error);
         }
 
+        /// <summary>
+        /// Delete answer to assignment
+        /// </summary>
         [HttpDelete("answers/{answerId}")]
         public async Task<IActionResult> DeleteAnswer(Guid answerId)
         {
@@ -100,6 +118,9 @@ namespace PlatformaBackend.Controllers
         #endregion
 
         #region Course
+        /// <summary>
+        /// Used to download all course files in .zip format
+        /// </summary>
         [HttpGet("course/{courseId}")]
         public async Task<IActionResult> DownloadCourse(Guid courseId)
         {
