@@ -1,6 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Platforma.Application.Answers;
-using Platforma.Application.Answers.DTO;
 using Platforma.Domain;
 
 namespace PlatformaBackend.Controllers

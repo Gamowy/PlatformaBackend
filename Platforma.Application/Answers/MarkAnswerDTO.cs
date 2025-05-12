@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Platforma.Application.Answers.DTO
+namespace Platforma.Application.Answers
 {
     public class MarkAnswerDTO
     {

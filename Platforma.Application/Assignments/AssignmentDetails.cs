@@ -1,5 +1,5 @@
 ﻿using MediatR;
-using Platforma.Application.Assignments.DTO;
+using Platforma.Application.Assignments;
 using Platforma.Domain;
 using Platforma.Infrastructure;
 

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Platforma.Application.Assignments.DTO
+namespace Platforma.Application.Assignments
 {
     public class AssignmentDTORequest
     {

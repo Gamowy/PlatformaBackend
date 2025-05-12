@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Platforma.Application.Answers.DTO;
 using Platforma.Infrastructure;
 using System;
 using System.Collections.Generic;

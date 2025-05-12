@@ -50,7 +50,8 @@ namespace Platforma.Application.Files
 
 
                 // Check file size
-                if (request.File.Length > 1000 * 1024 * 1024) // ~ 1GB
+                int maxFileSize = Int32.Parse(_configuration["FileStorageConfig:MaxFileSize"]!);
+                if (request.File.Length > maxFileSize)
                 {
                     return Result<Unit?>.Failure("File size exceeds the limit");
                 }
@@ -80,7 +81,7 @@ namespace Platforma.Application.Files
                     return Result<Unit?>.Failure("Course or assignment not found.");
                 }
                 string uploadPath = _configuration["FileStorageConfig:Path"]!;
-                string filePath = $"{assignment.CourseId}/answers/{assignment.Id}/{newAnswer.Id}/{Guid.NewGuid().ToString()}_{Path.GetFileName(request.File.FileName)}";
+                string filePath = $"{assignment.CourseId}/answers/{assignment.Id}/{newAnswer.UserId}/{Guid.NewGuid().ToString()}_{Path.GetFileName(request.File.FileName)}";
                 string fullPath = Path.Combine(uploadPath, filePath);
 
                 // Save file
@@ -96,7 +97,7 @@ namespace Platforma.Application.Files
                     }
                     // Save file path reference in database
                     newAnswer.FilePath = filePath;
-                    newAnswer.SubmittedDate = DateTime.Now;
+                    newAnswer.SubmittedDate = DateTime.UtcNow;
                     _context.Answers.Add(newAnswer);
                     var result = await _context.SaveChangesAsync() > 0;
                     if (!result)

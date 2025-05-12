@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using Platforma.Application;
 using Platforma.Application.Answers;
 using Platforma.Application.Assignments;
-using Platforma.Application.Assignments.DTO;
 using Platforma.Application.Files;
 using Platforma.Domain;
 using System.Runtime.InteropServices;
@@ -103,7 +102,7 @@ namespace PlatformaBackend.Controllers
                     return BadRequest("Couldn't remove bounded file");
             }
 
-            //Usuwanie odpowiedzi do usuwanego zadania
+            // Usuwanie odpowiedzi do usuwanego zadania
             if (resultDetails.IsSuccess && resultDetails.Value != null && resultDetails.Value.AnswerRequired)
             {
                 var answersResult = await Mediator.Send(new GetAllAssignmentAnswers.Query { AssignmentId = assignmentId });

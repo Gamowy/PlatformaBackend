@@ -43,7 +43,8 @@ namespace Platforma.Application.Files
                 }
 
                 // Check file size
-                if (request.File.Length > 1000 * 1024 * 1024) // ~ 1GB
+                int maxFileSize = Int32.Parse(_configuration["FileStorageConfig:MaxFileSize"]!); 
+                if (request.File.Length > maxFileSize)
                 {
                     return Result<Unit?>.Failure("File size exceeds the limit");
                 }

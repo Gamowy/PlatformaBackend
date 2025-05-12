@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Platforma.Application.Assignments.DTO;
 using Platforma.Domain;
 using Platforma.Infrastructure;
 
@@ -24,17 +23,22 @@ namespace Platforma.Application.Assignments
                 var course = await _context.Courses.FindAsync(request.AssignmentDTO.CourseId);
                 if (course == null) return Result<Unit?>.Failure("Course not found.");
                 if (request.AssignmentDTO.CourseId != request.AssignmentDTO.CourseId) return Result<Unit?>.Failure("Incorrect courseId.");
+                if (request.AssignmentDTO.OpenDate.HasValue && request.AssignmentDTO.Deadline.HasValue)
+                {
+                    if (request.AssignmentDTO.OpenDate > request.AssignmentDTO.Deadline)
+                        return Result<Unit?>.Failure("Open date cannot be after deadline.");
+                }
 
                 var assignment = new Assignment
                 {
                     CourseId = request.AssignmentDTO.CourseId,
                     Name = request.AssignmentDTO.AssignmentName ?? "New assignment",
                     Content = request.AssignmentDTO.AssignmentContent ?? "Assigment description",
-                    OpenDate = request.AssignmentDTO.OpenDate ?? DateTime.Now,
-                    Deadline = request.AssignmentDTO.Deadline ?? DateTime.Now.AddDays(7),
+                    OpenDate = request.AssignmentDTO.OpenDate ?? DateTime.UtcNow,
+                    Deadline = request.AssignmentDTO.Deadline ?? DateTime.UtcNow.AddDays(7),
                     FilePath = "",
                     AcceptedFileTypes = request.AssignmentDTO.AcceptedFileTypes ?? ".txt;.docx;.pdf;.zip",
-                    AnswerRequired = request.AssignmentDTO.AnswerRequired ?? true
+                    AnswerRequired = request.AssignmentDTO.AnswerRequired ?? false
                 };
                 _context.Assignments.Add(assignment);
                 var result = await _context.SaveChangesAsync() > 0;

@@ -8,6 +8,7 @@
     "DefaultConnection": "Server=localhost;Database=PlatformaBaza;User Id=root;Password=1234;Port=5010"
   },
   "FileStorageConfig": {
-    "Path": "Data/Files"
+    "Path": "Data/Files",
+    "MaxFileSize": 1073741824
   }
 }

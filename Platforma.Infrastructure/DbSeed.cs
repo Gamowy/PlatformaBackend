@@ -17,7 +17,8 @@ namespace Platforma.Infrastructure
             await seedUsers(dataContext);
             await seedCourses(dataContext);
             await seedAssignments(dataContext);
-            await seedAnwsers(dataContext);
+            // Nie ma sensu dodwać seed'a z odpowiedziami bez plików
+            // await seedAnwsers(dataContext);
         }
 
         private static async Task seedUsers(DataContext dataContext)
@@ -75,8 +76,8 @@ namespace Platforma.Infrastructure
                 Name = "TestLab",
                 Content = "wykonaj polecenia zawarte w pliku Lab1.pdf i zamieść odpowiedź na patformie",
                 Course = testCourse,
-                OpenDate = DateTime.Now.AddDays(-3),
-                Deadline = DateTime.Now.AddDays(4),
+                OpenDate = DateTime.UtcNow.AddDays(-3),
+                Deadline = DateTime.UtcNow.AddDays(4),
                 FilePath = "",
                 AcceptedFileTypes = ".zip;.pdf;.docx.;.txt"
             };
@@ -85,7 +86,7 @@ namespace Platforma.Infrastructure
             await dataContext.SaveChangesAsync();
         }
 
-        private static async Task seedAnwsers(DataContext dataContext)
+/*        private static async Task seedAnwsers(DataContext dataContext)
         {
             //TODO: po dodaniu mechanizmów przesyłania plików wrócić i dodać właściwy FilePath
             if (dataContext.Answers.Any()) return;
@@ -96,15 +97,15 @@ namespace Platforma.Infrastructure
 
             if (testAssignment == null || testUser == null) return;
 
-            var answer = new Answer { 
+            var answer = new Answer
+            {
                 Assignment = testAssignment,
                 User = testUser,
-                SubmittedDate = DateTime.Now,
                 FilePath = ""
             };
 
             await dataContext.AddAsync(answer);
             await dataContext.SaveChangesAsync();
-        }
+        }*/
     }
 }

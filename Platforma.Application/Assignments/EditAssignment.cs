@@ -1,5 +1,4 @@
 ﻿using MediatR;
-using Platforma.Application.Assignments.DTO;
 using Platforma.Infrastructure;
 
 namespace Platforma.Application.Assignments
@@ -23,6 +22,11 @@ namespace Platforma.Application.Assignments
             {
                 var assignment = await _context.Assignments.FindAsync(request.AssignmentId);
                 if (assignment == null) return Result<Unit?>.Failure("Assignment not found.");
+                if (request.AssignmentDTO.OpenDate.HasValue && request.AssignmentDTO.Deadline.HasValue)
+                {
+                    if (request.AssignmentDTO.OpenDate > request.AssignmentDTO.Deadline)
+                        return Result<Unit?>.Failure("Open date cannot be after deadline.");
+                }
 
                 assignment.Name = request.AssignmentDTO.AssignmentName ?? assignment.Name;
                 assignment.Content = request.AssignmentDTO.AssignmentContent ?? assignment.Content;
