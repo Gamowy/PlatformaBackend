@@ -15,6 +15,9 @@ namespace PlatformaBackend.Controllers
             _HttpContextAccessor = httpContextAccessor;
         }
 
+        /// <summary>
+        /// Assign student to course
+        /// </summary>
         [Authorize(Policy = "AdminOrTeacher")]
         [HttpPost("Teacher")]
         public async Task<IActionResult> AssignStudentToCourse(Guid courseId, Guid userId)
@@ -33,6 +36,9 @@ namespace PlatformaBackend.Controllers
             return BadRequest(result.Error);
         }
 
+        /// <summary>
+        /// Assign yourself to course
+        /// </summary>
         [Authorize(Policy = "NotAdmin")]
         [HttpPost]
         public async Task<IActionResult> AssignYourselfToCourse(Guid courseId)
@@ -53,6 +59,9 @@ namespace PlatformaBackend.Controllers
         }
 
 
+        /// <summary>
+        /// Accept user to course
+        /// </summary>
         [Authorize(Policy = "AdminOrTeacher")]
         [HttpPut("Teacher")]
         public async Task<IActionResult> AcceptUserToCourse(Guid courseId, Guid userId)
@@ -71,6 +80,9 @@ namespace PlatformaBackend.Controllers
             return BadRequest(result.Error);
         }
 
+        /// <summary>
+        /// Remove user from course
+        /// </summary>
         [Authorize(Policy = "AdminOrTeacher")]
         [HttpDelete("Teacher")]
         public async Task<IActionResult> RemoveUserFromCourse(Guid courseId, Guid userId)

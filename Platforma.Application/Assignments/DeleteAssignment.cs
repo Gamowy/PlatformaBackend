@@ -1,24 +1,14 @@
 ﻿using MediatR;
 using Platforma.Infrastructure;
-using Platforma.Domain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.ConstrainedExecution;
-using System.Text;
-using System.Threading.Tasks;
-using FluentValidation;
 
-
-namespace Platforma.Application.Courses
+namespace Platforma.Application.Assignments
 {
-    public class Create
+    public class DeleteAssignment
     {
         public class Command : IRequest<Result<Unit?>>
         {
-            public required Course Course { get; set; }
+            public required Guid AssignmentId { get; set; }
         }
-
 
         public class Handler : IRequestHandler<Command, Result<Unit?>>
         {
@@ -27,22 +17,14 @@ namespace Platforma.Application.Courses
             {
                 _context = context;
             }
-
-
             public async Task<Result<Unit?>> Handle(Command request, CancellationToken cancellationToken)
             {
-                _context.Courses.Add(request.Course);
+                var assignment = await _context.Assignments.FindAsync(request.AssignmentId);
+                if (assignment == null) return Result<Unit?>.Failure("Assignment not found.");
+                _context.Assignments.Remove(assignment);
                 var result = await _context.SaveChangesAsync() > 0;
+                if (!result) return Result<Unit?>.Failure("Failed to delete assignment.");
                 return Result<Unit?>.Success(Unit.Value);
-            }
-
-        }
-
-        public class CommandValidator : AbstractValidator<Command>
-        {
-            public CommandValidator()
-            {
-                RuleFor(x => x.Course).SetValidator(new CourseValidator());
             }
         }
     }

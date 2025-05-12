@@ -12,6 +12,8 @@ using FluentValidation.AspNetCore;
 using FluentValidation;
 using Platforma.Application.Users;
 using Platforma.Domain;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.Extensions.Options;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -88,9 +90,10 @@ builder.Services.AddSwaggerGen( c =>
             new string[]{ }
         } 
     });
+    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    c.IncludeXmlComments(xmlPath);
 });
-
-
 
 builder.Services.AddDbContext<DataContext>(opt =>
 {
@@ -113,8 +116,13 @@ builder.Services.AddCors(opt =>
     });
 });
 
+builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CourseList.Handler).Assembly));
 
-builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(List.Handler).Assembly));
+// Max request size
+builder.Services.Configure<KestrelServerOptions>(options =>
+{
+    options.Limits.MaxRequestBodySize = int.MaxValue; // Approximately 2GB (adjust as needed)
+});
 
 var app = builder.Build();
 

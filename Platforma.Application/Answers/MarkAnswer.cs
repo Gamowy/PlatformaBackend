@@ -1,24 +1,20 @@
 ﻿using MediatR;
 using Platforma.Infrastructure;
-using Platforma.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.ConstrainedExecution;
 using System.Text;
 using System.Threading.Tasks;
-using FluentValidation;
 
-
-namespace Platforma.Application.Courses
+namespace Platforma.Application.Answers
 {
-    public class Create
+    public class MarkAnswer
     {
         public class Command : IRequest<Result<Unit?>>
         {
-            public required Course Course { get; set; }
+            public required Guid AnswerId { get; set; }
+            public required MarkAnswerDTO MarkAnswerDTO { get; set; }
         }
-
 
         public class Handler : IRequestHandler<Command, Result<Unit?>>
         {
@@ -27,22 +23,15 @@ namespace Platforma.Application.Courses
             {
                 _context = context;
             }
-
-
             public async Task<Result<Unit?>> Handle(Command request, CancellationToken cancellationToken)
             {
-                _context.Courses.Add(request.Course);
+                var answer = await _context.Answers.FindAsync(request.AnswerId);
+                if (answer == null) return Result<Unit?>.Failure("Answer not found");
+                answer.Mark = request.MarkAnswerDTO.Mark;
+                answer.Comment = request.MarkAnswerDTO.Comment;
                 var result = await _context.SaveChangesAsync() > 0;
+                if (!result) return Result<Unit?>.Failure("Failed to mark answer");
                 return Result<Unit?>.Success(Unit.Value);
-            }
-
-        }
-
-        public class CommandValidator : AbstractValidator<Command>
-        {
-            public CommandValidator()
-            {
-                RuleFor(x => x.Course).SetValidator(new CourseValidator());
             }
         }
     }
