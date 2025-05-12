@@ -39,6 +39,9 @@ namespace Platforma.Application.Files
                 var user = await _context.Users.FindAsync(request.UserId);
                 if (user == null) return Result<Unit?>.Failure("User not found");
 
+                // Check if assignment require answer
+                if (!assignment.AnswerRequired) return Result<Unit?>.Failure("Assignment don't allow answers");
+
                 // Check if answer for specified user and specified assigmnent is already submited
                 var answer = _context.Answers
                     .Where(a => a.AssignmentId == request.AssignmentId && a.UserId == request.UserId)

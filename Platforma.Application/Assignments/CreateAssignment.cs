@@ -30,10 +30,11 @@ namespace Platforma.Application.Assignments
                     CourseId = request.AssignmentDTO.CourseId,
                     Name = request.AssignmentDTO.AssignmentName ?? "New assignment",
                     Content = request.AssignmentDTO.AssignmentContent ?? "Assigment description",
-                    OpenDate = DateTime.Now,
+                    OpenDate = request.AssignmentDTO.OpenDate ?? DateTime.Now,
                     Deadline = request.AssignmentDTO.Deadline ?? DateTime.Now.AddDays(7),
                     FilePath = "",
                     AcceptedFileTypes = request.AssignmentDTO.AcceptedFileTypes ?? ".txt;.docx;.pdf;.zip",
+                    AnswerRequired = request.AssignmentDTO.AnswerRequired ?? true
                 };
                 _context.Assignments.Add(assignment);
                 var result = await _context.SaveChangesAsync() > 0;

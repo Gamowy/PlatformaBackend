@@ -26,8 +26,10 @@ namespace Platforma.Application.Assignments
 
                 assignment.Name = request.AssignmentDTO.AssignmentName ?? assignment.Name;
                 assignment.Content = request.AssignmentDTO.AssignmentContent ?? assignment.Content;
+                assignment.OpenDate = request.AssignmentDTO.OpenDate ?? assignment.OpenDate;
                 assignment.Deadline = request.AssignmentDTO.Deadline ?? assignment.Deadline;
                 assignment.AcceptedFileTypes = request.AssignmentDTO.AcceptedFileTypes ?? assignment.AcceptedFileTypes;
+                assignment.AnswerRequired = request.AssignmentDTO.AnswerRequired ?? assignment.AnswerRequired;
 
                 var result = await _context.SaveChangesAsync() > 0;
                 if (!result) return Result<Unit?>.Failure("Failed to edit assignment.");

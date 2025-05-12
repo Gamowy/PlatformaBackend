@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Platforma.Application.Answers;
 using Platforma.Application.Answers.DTO;
+using Platforma.Domain;
 
 namespace PlatformaBackend.Controllers
 {
@@ -10,7 +11,7 @@ namespace PlatformaBackend.Controllers
         /// Get a list of all answers for specified assignment
         /// </summary>
         [HttpGet("{assignmentId}")]
-        public async Task<ActionResult<List<AnswerDTOResponse>>> GetAllAnswers(Guid assignmentId)
+        public async Task<ActionResult<List<Answer>>> GetAllAnswers(Guid assignmentId)
         {
             var result = await Mediator.Send(new GetAllAssignmentAnswers.Query { AssignmentId = assignmentId });
             if (result == null)
@@ -26,7 +27,7 @@ namespace PlatformaBackend.Controllers
         /// Get details about specified answer
         /// </summary>
         [HttpGet("details/{answerId}")]
-        public async Task<ActionResult<AnswerDTOResponse>> GetAnswerDetails(Guid answerId)
+        public async Task<ActionResult<Answer>> GetAnswerDetails(Guid answerId)
         {
             var result = await Mediator.Send(new GetAnswerDetails.Query { AnswerId = answerId });
             if (result == null)
