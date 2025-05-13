@@ -1,5 +1,6 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Platforma.Application.Courses.DTOs;
 using Platforma.Domain;
 using Platforma.Infrastructure;
 

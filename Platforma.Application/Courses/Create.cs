@@ -8,6 +8,7 @@ using System.Runtime.ConstrainedExecution;
 using System.Text;
 using System.Threading.Tasks;
 using FluentValidation;
+using Platforma.Application.Courses.DTOs;
 
 
 namespace Platforma.Application.Courses
@@ -16,7 +17,8 @@ namespace Platforma.Application.Courses
     {
         public class Command : IRequest<Result<Unit?>>
         {
-            public required Course Course { get; set; }
+            public required CourseCreateDTO CourseDTO { get; set; }
+            public required Guid UserId { get; set; }
         }
 
 
@@ -31,7 +33,20 @@ namespace Platforma.Application.Courses
 
             public async Task<Result<Unit?>> Handle(Command request, CancellationToken cancellationToken)
             {
-                _context.Courses.Add(request.Course);
+                User? owner = _context.Users.Where(u => u.Id.Equals(request.UserId)).First();
+
+                if (owner == null)
+                    return Result<Unit?>.Failure("Invalid Owner Id");
+
+                Course newCourse = new Course
+                {
+                    AcademicYear = request.CourseDTO.AcademicYear,
+                    Description = request.CourseDTO.Description,
+                    Name = request.CourseDTO.Name,
+                    Owner = owner
+                };
+
+                _context.Courses.Add(newCourse);
                 var result = await _context.SaveChangesAsync() > 0;
                 return Result<Unit?>.Success(Unit.Value);
             }
@@ -42,7 +57,7 @@ namespace Platforma.Application.Courses
         {
             public CommandValidator()
             {
-                RuleFor(x => x.Course).SetValidator(new CourseValidator());
+                RuleFor(x => x.CourseDTO).SetValidator(new CourseValidator());
             }
         }
     }

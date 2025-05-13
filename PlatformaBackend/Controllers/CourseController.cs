@@ -1,13 +1,21 @@
 ﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Platforma.Application;
 using Platforma.Application.Courses;
+using Platforma.Application.Courses.DTOs;
 using Platforma.Domain;
+using System.Security.Claims;
 
 namespace PlatformaBackend.Controllers
 {
     public class CourseController : BaseAPIController
     {
+        private readonly IHttpContextAccessor _HttpContextAccessor;
+
+        public CourseController(IHttpContextAccessor httpContextAccessor) {
+            _HttpContextAccessor = httpContextAccessor;
+        }
 
         /// <summary>
         /// Get a list of all courses
@@ -29,7 +37,7 @@ namespace PlatformaBackend.Controllers
         /// Get a list of users for specifed course
         /// </summary>
         [HttpGet("{courseId}/users")]
-        public async Task<ActionResult<List<User>>> GetUsersForCourse(Guid courseId)
+        public async Task<ActionResult<List<UserCourseDTO>>> GetUsersForCourse(Guid courseId)
         {
             var result = await Mediator.Send(new UserList.Query { CourseId = courseId });
 
@@ -65,10 +73,13 @@ namespace PlatformaBackend.Controllers
         /// Edit course
         /// </summary>
         [HttpPut("{courseId}")]
-        public async Task<IActionResult> EditCourse(Guid courseId, Course course)
+        [Authorize(Policy = "AdminOrTeacher")]
+        public async Task<IActionResult> EditCourse(Guid courseId, CourseEditDTO course)
         {
-            course.Id = courseId;
-            var result = await Mediator.Send(new Edit.Command { Course = course });
+            if (!await CheckIfAdminOrOwner(courseId))
+                return Forbid();
+
+            var result = await Mediator.Send(new Edit.Command { CourseDTO = course, CourseId = courseId });
 
             if (result == null)
                 return NotFound();
@@ -83,9 +94,13 @@ namespace PlatformaBackend.Controllers
         /// Create a new course
         /// </summary>
         [HttpPost]
-        public async Task<IActionResult> CreateCourse(Course course)
+        [Authorize(Policy = "AdminOrTeacher")]
+        public async Task<IActionResult> CreateCourse(CourseCreateDTO course)
         {
-            var result = await Mediator.Send(new Create.Command { Course = course });
+            var result = await Mediator.Send(new Create.Command { 
+                CourseDTO = course,
+                UserId = Guid.Parse(_HttpContextAccessor.HttpContext!.User.FindFirst("UserId")!.Value)
+            });
 
             if (result == null)
                 return NotFound();
@@ -100,8 +115,12 @@ namespace PlatformaBackend.Controllers
         /// Delete a course
         /// </summary>
         [HttpDelete("{id}")]
+        [Authorize(Policy = "AdminOrTeacher")]
         public async Task<IActionResult> DeleteCourse(Guid id)
         {
+            if (!await CheckIfAdminOrOwner(id))
+                return Forbid();
+
             var result = await Mediator.Send(new Delete.Command { Id = id });
 
             if (result == null)
@@ -111,6 +130,18 @@ namespace PlatformaBackend.Controllers
             if (result.IsSuccess && result.Value == null)
                 return NotFound();
             return BadRequest(result.Error);
+        }
+
+        private async Task<bool> CheckIfAdminOrOwner(Guid courseId)
+        {
+            if (_HttpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.Role)!.Value.Equals(Platforma.Domain.User.Roles.Administrator))
+                return true;
+
+            var courseToCheck = await Mediator.Send(new Details.Query { id = courseId });
+            if (courseToCheck.IsSuccess && courseToCheck.Value.OwnerId.Equals(Guid.Parse(_HttpContextAccessor.HttpContext!.User.FindFirst("UserId")!.Value)))
+                return true;
+
+            return false;
         }
     }
 

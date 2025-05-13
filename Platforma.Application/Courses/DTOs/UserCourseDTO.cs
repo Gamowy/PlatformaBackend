@@ -1,6 +1,6 @@
 ﻿using Platforma.Domain;
 
-namespace Platforma.Application.Courses
+namespace Platforma.Application.Courses.DTOs
 {
     public class UserCourseDTO
     {

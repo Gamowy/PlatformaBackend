@@ -110,10 +110,11 @@ namespace PlatformaBackend.Controllers
                 return true;
 
             var course = await Mediator.Send(new Platforma.Application.Courses.Details.Query { id = courseId });
-            //owner lub współprowadzący może przypisać kogoś do kursu
+            //owner
             if (course.IsSuccess && course.Value.OwnerId.Equals(Guid.Parse(_HttpContextAccessor.HttpContext.User.FindFirst("UserId").Value)))
                 return true;
 
+            //lub współprowadzący
             var courseUsers = await Mediator.Send(new Platforma.Application.Courses.UserList.Query { CourseId = courseId });
             if (courseUsers.IsSuccess &&
                 courseUsers.Value.Where(u => u.Id.Equals(Guid.Parse(_HttpContextAccessor.HttpContext.User.FindFirst("UserId").Value)) &&
