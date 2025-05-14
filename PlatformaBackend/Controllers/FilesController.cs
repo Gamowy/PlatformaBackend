@@ -1,21 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Platforma.Application;
 using Platforma.Application.Answers;
 using Platforma.Application.Assignments;
 using Platforma.Application.Files;
-using Platforma.Domain;
-using System.Security.Claims;
 
 namespace PlatformaBackend.Controllers
 {
     public class FilesController : BaseAPIController
     {
-        private readonly IHttpContextAccessor _HttpContextAccessor;
-        public FilesController(IHttpContextAccessor httpContextAccessor)
-        {
-            _HttpContextAccessor = httpContextAccessor;
-        }
 
         #region Assignments
         /// <summary>
@@ -98,14 +90,7 @@ namespace PlatformaBackend.Controllers
             if (!answer.IsSuccess || answer.Value == null)
                 return BadRequest("Couldn't get authorization details");
 
-            var assignmentDetails = await Mediator.Send(new AssignmentDetails.Query { AssignmentId = answer.Value.AssignmentId });
-
-            if (_HttpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.Role)!.Value.Equals(Platforma.Domain.User.Roles.Student) &&
-                !answer.Value.UserId.Equals(Guid.Parse(_HttpContextAccessor.HttpContext.User.FindFirst("UserId")!.Value)))
-                return Forbid();
-            else if (!assignmentDetails.IsSuccess || assignmentDetails.Value == null)
-                return BadRequest("Couldn't get authorization details");
-            else if (!await UserParticipateInCourse(assignmentDetails.Value.CourseId))
+            if (!await OwnerOfAnswerOrTeacher(answer.Value))
                 return Forbid();
 
             var result = await Mediator.Send(new DownloadAnswerFile.Query { AnswerId = answerId });
@@ -134,7 +119,7 @@ namespace PlatformaBackend.Controllers
                 return Forbid();
 
 
-            var userId = Guid.Parse(_HttpContextAccessor.HttpContext!.User.FindFirst("UserId")!.Value);
+            var userId = Guid.Parse(HttpContextAccessor.HttpContext!.User.FindFirst("UserId")!.Value);
             var result = await Mediator.Send(new UploadAnswerFile.Command { UserId = userId, AssignmentId = assignmentId, File = file });
             if (result == null)
                 return NotFound();
@@ -156,7 +141,7 @@ namespace PlatformaBackend.Controllers
             var answerDetails = await Mediator.Send(new GetAnswerDetails.Query { AnswerId = answerId });
             if (!answerDetails.IsSuccess || answerDetails.Value == null)
                 return BadRequest("Couldn't get authorization details");
-            else if (!answerDetails.Value.UserId.Equals(Guid.Parse(_HttpContextAccessor.HttpContext!.User.FindFirst("UserId")!.Value)))
+            else if (!answerDetails.Value.UserId.Equals(Guid.Parse(HttpContextAccessor.HttpContext!.User.FindFirst("UserId")!.Value)))
                 return Forbid();
 
             var result = await Mediator.Send(new DeleteAnswerFile.Command { AnswerId = answerId });
@@ -192,25 +177,5 @@ namespace PlatformaBackend.Controllers
         }
         #endregion
 
-        private async Task<bool> UserParticipateInCourse(Guid courseId)
-        {
-            //Admin może wszystko
-            if (_HttpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.Role)!.Value.Equals(Platforma.Domain.User.Roles.Administrator))
-                return true;
-
-            var course = await Mediator.Send(new Platforma.Application.Courses.Details.Query { id = courseId });
-            //owner
-            if (course.IsSuccess && course.Value.OwnerId.Equals(Guid.Parse(_HttpContextAccessor.HttpContext.User.FindFirst("UserId")!.Value)))
-                return true;
-
-            //lub uczestnik
-            var courseUsers = await Mediator.Send(new Platforma.Application.Courses.UserList.Query { CourseId = courseId });
-            if (courseUsers.IsSuccess &&
-                courseUsers.Value.Where(u => u.Id.Equals(Guid.Parse(_HttpContextAccessor.HttpContext.User.FindFirst("UserId")!.Value)) &&
-                u.status == UserStatus.Accepted).FirstOrDefault() != null)
-                return true;
-
-            return false;
-        }
     }
 }

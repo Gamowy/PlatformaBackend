@@ -1,22 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Platforma.Application;
 using Platforma.Application.Courses;
 using Platforma.Application.Courses.DTOs;
 using Platforma.Domain;
-using System.Security.Claims;
 
 namespace PlatformaBackend.Controllers
 {
     public class CourseController : BaseAPIController
     {
-        private readonly IHttpContextAccessor _HttpContextAccessor;
-
-        public CourseController(IHttpContextAccessor httpContextAccessor) {
-            _HttpContextAccessor = httpContextAccessor;
-        }
-
         /// <summary>
         /// Get a list of all courses
         /// </summary>
@@ -99,7 +90,7 @@ namespace PlatformaBackend.Controllers
         {
             var result = await Mediator.Send(new Create.Command { 
                 CourseDTO = course,
-                UserId = Guid.Parse(_HttpContextAccessor.HttpContext!.User.FindFirst("UserId")!.Value)
+                UserId = Guid.Parse(HttpContextAccessor.HttpContext!.User.FindFirst("UserId")!.Value)
             });
 
             if (result == null)
@@ -130,18 +121,6 @@ namespace PlatformaBackend.Controllers
             if (result.IsSuccess && result.Value == null)
                 return NotFound();
             return BadRequest(result.Error);
-        }
-
-        private async Task<bool> CheckIfAdminOrOwner(Guid courseId)
-        {
-            if (_HttpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.Role)!.Value.Equals(Platforma.Domain.User.Roles.Administrator))
-                return true;
-
-            var courseToCheck = await Mediator.Send(new Details.Query { id = courseId });
-            if (courseToCheck.IsSuccess && courseToCheck.Value.OwnerId.Equals(Guid.Parse(_HttpContextAccessor.HttpContext!.User.FindFirst("UserId")!.Value)))
-                return true;
-
-            return false;
         }
     }
 

@@ -3,18 +3,11 @@ using Microsoft.AspNetCore.Mvc;
 using Platforma.Application.Answers;
 using Platforma.Application.Assignments;
 using Platforma.Domain;
-using System.Security.Claims;
 
 namespace PlatformaBackend.Controllers
 {
     public class AnswersController : BaseAPIController
     {
-        private readonly IHttpContextAccessor _HttpContextAccessor;
-        public AnswersController(IHttpContextAccessor httpContextAccessor)
-        {
-            _HttpContextAccessor = httpContextAccessor;
-        }
-
         /// <summary>
         /// Get a list of all answers for specified assignment
         /// </summary>
@@ -52,17 +45,10 @@ namespace PlatformaBackend.Controllers
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
             {
-                var assignmentDetails = await Mediator.Send(new AssignmentDetails.Query { AssignmentId = result.Value.AssignmentId });
-
-                if (_HttpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.Role)!.Value.Equals(Platforma.Domain.User.Roles.Student) &&
-                    !result.Value.UserId.Equals(Guid.Parse(_HttpContextAccessor.HttpContext.User.FindFirst("UserId")!.Value)))
-                    return Forbid();
-                else if (!assignmentDetails.IsSuccess || assignmentDetails.Value == null)
-                    return BadRequest("Couldn't get authorization details");
-                else if (!await UserParticipateInCourse(assignmentDetails.Value.CourseId))
-                    return Forbid();
-                else
+                if (await OwnerOfAnswerOrTeacher(result.Value))
                     return Ok(result.Value);
+                else
+                    return Forbid();
             }
             return BadRequest(result.Error);
         }
@@ -93,27 +79,6 @@ namespace PlatformaBackend.Controllers
             if (result.IsSuccess && result.Value == null)
                 return NotFound();
             return BadRequest(result.Error);
-        }
-
-        private async Task<bool> UserParticipateInCourse(Guid courseId)
-        {
-            //Admin może wszystko
-            if (_HttpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.Role)!.Value.Equals(Platforma.Domain.User.Roles.Administrator))
-                return true;
-
-            var course = await Mediator.Send(new Platforma.Application.Courses.Details.Query { id = courseId });
-            //owner
-            if (course.IsSuccess && course.Value.OwnerId.Equals(Guid.Parse(_HttpContextAccessor.HttpContext.User.FindFirst("UserId")!.Value)))
-                return true;
-
-            //lub uczestnik
-            var courseUsers = await Mediator.Send(new Platforma.Application.Courses.UserList.Query { CourseId = courseId });
-            if (courseUsers.IsSuccess &&
-                courseUsers.Value.Where(u => u.Id.Equals(Guid.Parse(_HttpContextAccessor.HttpContext.User.FindFirst("UserId")!.Value)) &&
-                u.status == UserStatus.Accepted).FirstOrDefault() != null)
-                return true;
-
-            return false;
         }
     }
 }

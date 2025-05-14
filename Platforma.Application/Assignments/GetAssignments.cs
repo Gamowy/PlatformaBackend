@@ -1,6 +1,5 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Platforma.Application.Assignments;
 using Platforma.Domain;
 using Platforma.Infrastructure;
 

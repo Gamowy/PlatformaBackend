@@ -1,19 +1,13 @@
 ﻿using FluentValidation;
 using MediatR;
-using Platforma.Application.Courses;
 using Platforma.Domain;
 using Platforma.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Platforma.Application.CourseUsers
 {
     public class AssignRequest
     {
-        public class Command : IRequest<Result<Unit>>
+        public class Command : IRequest<Result<Unit?>>
         {
             public required Guid CourseId { get; set; }
             public required Guid UserId { get; set; }
@@ -21,7 +15,7 @@ namespace Platforma.Application.CourseUsers
         }
 
 
-        public class Handler : IRequestHandler<Command, Result<Unit>>
+        public class Handler : IRequestHandler<Command, Result<Unit?>>
         {
             private readonly DataContext _context;
             public Handler(DataContext context)
@@ -30,16 +24,16 @@ namespace Platforma.Application.CourseUsers
             }
 
 
-            public async Task<Result<Unit>> Handle(Command request, CancellationToken cancellationToken)
+            public async Task<Result<Unit?>> Handle(Command request, CancellationToken cancellationToken)
             {
                 CourseUser? exists = _context.CourseUsers
                     .Where(cu => cu.UserID.Equals(request.UserId) && cu.CourseID.Equals(request.CourseId)).FirstOrDefault();
 
-                if (exists != null) return Result<Unit>.Failure("user already assigned to course or request incorrect");
+                if (exists != null) return Result<Unit?>.Failure("user already assigned to course or request incorrect");
 
                 Course? course = _context.Courses.Where(c => c.Id.Equals(request.CourseId)).FirstOrDefault();
                 if(course != null && course.OwnerId.Equals(request.UserId))
-                    return Result<Unit>.Failure("Owner can't be course participant");
+                    return Result<Unit?>.Failure("Owner can't be course participant");
 
                 CourseUser assignation = new CourseUser
                 {
@@ -50,7 +44,7 @@ namespace Platforma.Application.CourseUsers
 
                 _context.CourseUsers.Add(assignation);
                 var reult = await _context.SaveChangesAsync() > 0;
-                return Result<Unit>.Success(Unit.Value);
+                return Result<Unit?>.Success(Unit.Value);
             }
 
         }

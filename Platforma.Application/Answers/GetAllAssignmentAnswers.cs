@@ -1,13 +1,7 @@
 ﻿using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Platforma.Application.Assignments;
 using Platforma.Domain;
 using Platforma.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Platforma.Application.Answers
 {

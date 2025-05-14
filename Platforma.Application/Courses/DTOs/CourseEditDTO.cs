@@ -1,12 +1,4 @@
-﻿using Platforma.Domain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
-
-namespace Platforma.Application.Courses.DTOs
+﻿namespace Platforma.Application.Courses.DTOs
 {
     public class CourseEditDTO
     {

@@ -1,26 +1,15 @@
-﻿using Azure.Core;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Platforma.Application;
 using Platforma.Application.Answers;
 using Platforma.Application.Assignments;
 using Platforma.Application.Files;
 using Platforma.Domain;
-using System.Runtime.InteropServices;
-using System.Security.Claims;
 
 
 namespace PlatformaBackend.Controllers
 {
     public class AssignmentsController : BaseAPIController
     {
-        private readonly IHttpContextAccessor _HttpContextAccessor;
-        public AssignmentsController(IHttpContextAccessor httpContextAccessor)
-        {
-            _HttpContextAccessor = httpContextAccessor;
-        }
-
-
         /// <summary>
         /// Get a list of all assignments for specified course
         /// </summary>
@@ -146,27 +135,6 @@ namespace PlatformaBackend.Controllers
             if (result.IsSuccess && result.Value == null)
                 return NotFound();
             return BadRequest(result.Error);
-        }
-
-        private async Task<bool> UserParticipateInCourse(Guid courseId)
-        {
-            //Admin może wszystko
-            if (_HttpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.Role)!.Value.Equals(Platforma.Domain.User.Roles.Administrator))
-                return true;
-
-            var course = await Mediator.Send(new Platforma.Application.Courses.Details.Query { id = courseId });
-            //owner
-            if (course.IsSuccess && course.Value.OwnerId.Equals(Guid.Parse(_HttpContextAccessor.HttpContext.User.FindFirst("UserId")!.Value)))
-                return true;
-
-            //lub uczestnik
-            var courseUsers = await Mediator.Send(new Platforma.Application.Courses.UserList.Query { CourseId = courseId });
-            if (courseUsers.IsSuccess &&
-                courseUsers.Value.Where(u => u.Id.Equals(Guid.Parse(_HttpContextAccessor.HttpContext.User.FindFirst("UserId")!.Value)) &&
-                u.status == UserStatus.Accepted).FirstOrDefault() != null)
-                return true;
-
-            return false;
         }
     }
 }

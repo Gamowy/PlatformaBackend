@@ -1,14 +1,6 @@
-﻿using FluentValidation;
-using MediatR;
-using Platforma.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.ConstrainedExecution;
-using System.Text;
-using System.Threading.Tasks;
-using Platforma.Domain;
+﻿using MediatR;
 using Platforma.Application.Courses.DTOs;
+using Platforma.Infrastructure;
 
 namespace Platforma.Application.Courses
 {
