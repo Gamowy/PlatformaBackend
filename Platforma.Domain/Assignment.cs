@@ -10,7 +10,7 @@ namespace Platforma.Domain
         public Course Course { get; set; }
         public string Name { get; set; }
         public string Content { get; set; }
-        public DateTime OpenDate { get; set; }
+        public DateTime? OpenDate { get; set; }
         public DateTime Deadline { get; set; }
         [JsonIgnore]
         public string FilePath { get; set; }
