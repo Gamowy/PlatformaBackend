@@ -41,7 +41,11 @@ namespace PlatformaBackend.Controllers
         [HttpPost("passwordChange")]
         public async Task<IActionResult> ChangePassword(PassChangeDTO passChangeDTO)
         {
-            var result = await Mediator.Send(new EditPassword.Command { PassResetDTO = passChangeDTO});
+            var result = await Mediator.Send(new EditPassword.Command
+            {
+                PassResetDTO = passChangeDTO,
+                UserId = Guid.Parse(HttpContextAccessor.HttpContext!.User.FindFirst("UserId")!.Value)
+            });
 
             if (result == null || (result.IsSuccess && result.Value == null))
                 return NotFound();

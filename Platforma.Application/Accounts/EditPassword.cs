@@ -11,6 +11,7 @@ namespace Platforma.Application.Accounts
         public class Command : IRequest<Result<Unit?>>
         {
             public required PassChangeDTO PassResetDTO { get; set; }
+            public required Guid UserId { get; set; }
         }
 
         public class Handler : IRequestHandler<Command, Result<Unit?>>
@@ -24,7 +25,7 @@ namespace Platforma.Application.Accounts
 
             public async Task<Result<Unit?>> Handle(Command request, CancellationToken cancellationToken)
             {
-                var user = _context.Users.Where(u => u.Username == request.PassResetDTO.Username).FirstOrDefault();
+                var user = _context.Users.Where(u => u.Id == request.UserId).FirstOrDefault();
 
                 if (user != null)
                 {
