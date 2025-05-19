@@ -4,6 +4,7 @@ using Platforma.Application.Answers;
 using Platforma.Application.Assignments;
 using Platforma.Application.Files;
 using Platforma.Domain;
+using System.Security.Claims;
 
 
 namespace PlatformaBackend.Controllers
@@ -22,10 +23,15 @@ namespace PlatformaBackend.Controllers
             var result = await Mediator.Send(new GetAssignments.Query { CourseId = courseId });
             if (result == null)
                 return NotFound();
-            if (result.IsSuccess && result.Value != null)
-                return Ok(result.Value);
             if (result.IsSuccess && result.Value == null)
                 return NotFound();
+            if (result.IsSuccess && result.Value != null)
+            {
+                var AssignmentList = result.Value;
+                if (HttpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.Role)!.Value.Equals(Platforma.Domain.User.Roles.Student))
+                    AssignmentList = result.Value.Where(a => a.OpenDate != null).ToList();
+                return Ok(AssignmentList);
+            }
             return BadRequest(result.Error);
         }
 
@@ -42,7 +48,8 @@ namespace PlatformaBackend.Controllers
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
             {
-                if (!await UserParticipateInCourse(result.Value.CourseId))
+                if (!await UserParticipateInCourse(result.Value.CourseId) ||
+                    (HttpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.Role)!.Value.Equals(Platforma.Domain.User.Roles.Student) && result.Value.OpenDate == null))
                     return Forbid();
                 return Ok(result.Value);
             }
