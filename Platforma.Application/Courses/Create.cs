@@ -42,7 +42,8 @@ namespace Platforma.Application.Courses
 
                 _context.Courses.Add(newCourse);
                 var result = await _context.SaveChangesAsync() > 0;
-                return Result<Unit?>.Success(Unit.Value);
+                if(!result) return Result<Unit?>.Failure("Course could not be saved");
+                return Result<Unit?>.Success(Unit.Value);                    
             }
 
         }

@@ -1,4 +1,5 @@
 ﻿using FluentValidation;
+using Platforma.Application.Accounts.DTOs;
 
 namespace Platforma.Application.Users
 {

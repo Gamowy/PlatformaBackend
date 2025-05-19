@@ -1,8 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Platforma.Domain;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Platforma.Application.Accounts;
+using Platforma.Application.Accounts.DTOs;
 using Platforma.Application.Users;
-using Microsoft.AspNetCore.Authorization;
-using Platforma.Application.Courses;
 
 namespace PlatformaBackend.Controllers
 {
@@ -30,6 +30,18 @@ namespace PlatformaBackend.Controllers
         public async Task<IActionResult> RegisterUser(UserRegisterDTO userRegisterDTO)
         {
             var result = await Mediator.Send(new Register.Command { UserRegisterDTO = userRegisterDTO });
+
+            if (result == null || (result.IsSuccess && result.Value == null))
+                return NotFound();
+            if (result.IsSuccess && result.Value != null)
+                return Ok(result.Value);
+            return BadRequest(result.Error);
+        }
+
+        [HttpPost("passwordChange")]
+        public async Task<IActionResult> ChangePassword(PassChangeDTO passChangeDTO)
+        {
+            var result = await Mediator.Send(new EditPassword.Command { PassResetDTO = passChangeDTO});
 
             if (result == null || (result.IsSuccess && result.Value == null))
                 return NotFound();

@@ -1,6 +1,7 @@
 ﻿using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
+using Platforma.Application.Accounts.DTOs;
 using Platforma.Domain;
 using Platforma.Infrastructure;
 

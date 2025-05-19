@@ -1,4 +1,4 @@
-﻿namespace Platforma.Application.Users
+﻿namespace Platforma.Application.Accounts.DTOs
 {
     public class UserLoginDTO
     {
