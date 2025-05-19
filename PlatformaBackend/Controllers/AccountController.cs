@@ -16,12 +16,10 @@ namespace PlatformaBackend.Controllers
         public async Task<ActionResult<String?>> GetToken(UserLoginDTO userLoginDTO)
         {
             var result = await Mediator.Send(new Login.Query { UserLoginDTO = userLoginDTO });
-            if (result == null)
+            if (result == null || (result.IsSuccess && result.Value == null))
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
                 return Ok(result.Value);
-            if (result.IsSuccess && result.Value == null)
-                return NotFound();
             return BadRequest(result.Error);
         }
 
@@ -33,12 +31,10 @@ namespace PlatformaBackend.Controllers
         {
             var result = await Mediator.Send(new Register.Command { UserRegisterDTO = userRegisterDTO });
 
-            if (result == null)
+            if (result == null || (result.IsSuccess && result.Value == null))
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
                 return Ok(result.Value);
-            if (result.IsSuccess && result.Value == null)
-                return NotFound();
             return BadRequest(result.Error);
         }
     }

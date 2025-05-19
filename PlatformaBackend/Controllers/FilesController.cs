@@ -23,12 +23,10 @@ namespace PlatformaBackend.Controllers
                 return Forbid();
 
             var result = await Mediator.Send(new DownloadAssignmentFile.Query { AssignmentId = assignmentId });
-            if (result == null)
+            if (result == null || (result.IsSuccess && result.Value == null))
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
                 return result.Value;
-            if (result.IsSuccess && result.Value == null)
-                return NotFound();
             return BadRequest(result.Error);
         }
 
@@ -46,12 +44,10 @@ namespace PlatformaBackend.Controllers
                 return Forbid();
 
             var result = await Mediator.Send(new UploadAssignmentFile.Command { AssignmentId = assignmentId, File = file });
-            if (result == null)
+            if (result == null || (result.IsSuccess && result.Value == null))
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
                 return Ok(result.Value);
-            if (result.IsSuccess && result.Value == null)
-                return NotFound();
             return BadRequest(result.Error);
         }
 
@@ -69,12 +65,10 @@ namespace PlatformaBackend.Controllers
                 return Forbid();
 
             var result = await Mediator.Send(new RemoveAssignmentFile.Command { AssignmentId = assignmentId });
-            if (result == null)
+            if (result == null || (result.IsSuccess && result.Value == null))
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
                 return Ok(result.Value);
-            if (result.IsSuccess && result.Value == null)
-                return NotFound();
             return BadRequest(result.Error);
         }
         #endregion
@@ -94,12 +88,10 @@ namespace PlatformaBackend.Controllers
                 return Forbid();
 
             var result = await Mediator.Send(new DownloadAnswerFile.Query { AnswerId = answerId });
-            if (result == null)
+            if (result == null || (result.IsSuccess && result.Value == null))
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
                 return result.Value;
-            if (result.IsSuccess && result.Value == null)
-                return NotFound();
             
             return BadRequest(result.Error);
         }
@@ -121,12 +113,10 @@ namespace PlatformaBackend.Controllers
 
             var userId = Guid.Parse(HttpContextAccessor.HttpContext!.User.FindFirst("UserId")!.Value);
             var result = await Mediator.Send(new UploadAnswerFile.Command { UserId = userId, AssignmentId = assignmentId, File = file });
-            if (result == null)
+            if (result == null || (result.IsSuccess && result.Value == null))
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
                 return Ok(result.Value);
-            if (result.IsSuccess && result.Value == null)
-                return NotFound();
             return BadRequest(result.Error);
         }
 
@@ -145,12 +135,10 @@ namespace PlatformaBackend.Controllers
                 return Forbid();
 
             var result = await Mediator.Send(new DeleteAnswerFile.Command { AnswerId = answerId });
-            if (result == null)
+            if (result == null || (result.IsSuccess && result.Value == null))
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
                 return Ok(result.Value);
-            if (result.IsSuccess && result.Value == null)
-                return NotFound();
             return BadRequest(result.Error);
         }
         #endregion
@@ -167,12 +155,10 @@ namespace PlatformaBackend.Controllers
                 return Forbid();
 
             var result = await Mediator.Send(new DownloadAllCourseFiles.Query { CourseId = courseId });
-            if (result == null)
+            if (result == null || (result.IsSuccess && result.Value == null))
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
                 return result.Value;
-            if (result.IsSuccess && result.Value == null)
-                return NotFound();
             return BadRequest(result.Error);
         }
         #endregion

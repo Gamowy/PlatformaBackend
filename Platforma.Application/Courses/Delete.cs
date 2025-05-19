@@ -1,4 +1,5 @@
 ﻿using MediatR;
+using Platforma.Domain;
 using Platforma.Infrastructure;
 
 namespace Platforma.Application.Courses
@@ -23,6 +24,7 @@ namespace Platforma.Application.Courses
             public async Task<Result<Unit?>> Handle(Command request, CancellationToken cancellationToken)
             {
                 var course = await _context.Courses.FindAsync(request.Id);
+                if (course == null) return Result<Unit?>.Failure("Course to delete not found");
 
                 _context.Remove(course);
                 var result = await _context.SaveChangesAsync() > 0;

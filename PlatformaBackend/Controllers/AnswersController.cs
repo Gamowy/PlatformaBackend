@@ -23,12 +23,10 @@ namespace PlatformaBackend.Controllers
                 return Forbid();
 
             var result = await Mediator.Send(new GetAllAssignmentAnswers.Query { AssignmentId = assignmentId });
-            if (result == null)
+            if (result == null || (result.IsSuccess && result.Value == null))
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
                 return Ok(result.Value);
-            if (result.IsSuccess && result.Value == null)
-                return NotFound();
             return BadRequest(result.Error);
         }
 
@@ -39,9 +37,7 @@ namespace PlatformaBackend.Controllers
         public async Task<ActionResult<Answer>> GetAnswerDetails(Guid answerId)
         {
             var result = await Mediator.Send(new GetAnswerDetails.Query { AnswerId = answerId });
-            if (result == null)
-                return NotFound();
-            if (result.IsSuccess && result.Value == null)
+            if (result == null || (result.IsSuccess && result.Value == null))
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
             {
@@ -72,12 +68,10 @@ namespace PlatformaBackend.Controllers
                 return Forbid();
 
             var result = await Mediator.Send(new MarkAnswer.Command { AnswerId = answerId, MarkAnswerDTO = markAnswerDTO });
-            if (result == null)
+            if (result == null || (result.IsSuccess && result.Value == null))
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
                 return Ok(result.Value);
-            if (result.IsSuccess && result.Value == null)
-                return NotFound();
             return BadRequest(result.Error);
         }
     }

@@ -15,12 +15,10 @@ namespace PlatformaBackend.Controllers
         public async Task<ActionResult<List<Course>>> GetCourses()
         {
             var result = await Mediator.Send(new CourseList.Query());
-            if (result == null)
+            if (result == null || (result.IsSuccess && result.Value == null))
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
                 return Ok(result.Value);
-            if (result.IsSuccess && result.Value == null)
-                return NotFound();
             return BadRequest(result.Error);
         }
 
@@ -32,12 +30,10 @@ namespace PlatformaBackend.Controllers
         {
             var result = await Mediator.Send(new UserList.Query { CourseId = courseId });
 
-            if (result == null)
+            if (result == null || (result.IsSuccess && result.Value == null))
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
                 return Ok(result.Value);
-            if (result.IsSuccess && result.Value == null)
-                return NotFound();
 
             return BadRequest(result.Error);
         }
@@ -50,12 +46,10 @@ namespace PlatformaBackend.Controllers
         {
             var result = await Mediator.Send(new Details.Query { id = courseId });
 
-            if (result == null)
+            if (result == null || (result.IsSuccess && result.Value == null))
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
                 return Ok(result.Value);
-            if (result.IsSuccess && result.Value == null)
-                return NotFound();
             return BadRequest(result.Error);
 
         }
@@ -72,12 +66,10 @@ namespace PlatformaBackend.Controllers
 
             var result = await Mediator.Send(new Edit.Command { CourseDTO = course, CourseId = courseId });
 
-            if (result == null)
+            if (result == null || (result.IsSuccess && result.Value == null))
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
                 return Ok(result.Value);
-            if (result.IsSuccess && result.Value == null)
-                return NotFound();
             return BadRequest(result.Error);
         }
 
@@ -93,12 +85,10 @@ namespace PlatformaBackend.Controllers
                 UserId = Guid.Parse(HttpContextAccessor.HttpContext!.User.FindFirst("UserId")!.Value)
             });
 
-            if (result == null)
+            if (result == null || (result.IsSuccess && result.Value == null))
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
                 return Ok(result.Value);
-            if (result.IsSuccess && result.Value == null)
-                return NotFound();
             return BadRequest(result.Error);
         }
 
@@ -114,12 +104,10 @@ namespace PlatformaBackend.Controllers
 
             var result = await Mediator.Send(new Delete.Command { Id = id });
 
-            if (result == null)
+            if (result == null || (result.IsSuccess && result.Value == null))
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
                 return Ok(result.Value);
-            if (result.IsSuccess && result.Value == null)
-                return NotFound();
             return BadRequest(result.Error);
         }
     }

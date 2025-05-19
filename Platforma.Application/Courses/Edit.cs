@@ -25,7 +25,7 @@ namespace Platforma.Application.Courses
             public async Task<Result<Unit?>> Handle(Command request, CancellationToken cancellationToken)
             {
                 var course = await _context.Courses.FindAsync(request.CourseId);
-                if (course == null) return null;
+                if (course == null) return Result<Unit?>.Failure("Course to update not found.");
 
                 course.Name = request.CourseDTO.Name ?? course.Name;
                 course.Description = request.CourseDTO.Description ?? course.Description;

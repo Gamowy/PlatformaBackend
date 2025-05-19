@@ -21,9 +21,7 @@ namespace PlatformaBackend.Controllers
 
             Result<Unit?> result = await Mediator.Send(new AssignRequest.Command() {CourseId = courseId, UserId = userId, status = UserStatus.Accepted});
 
-            if (result == null)
-                return NotFound();
-            if (result.IsSuccess && result.Value == null)
+            if (result == null || (result.IsSuccess && result.Value == null))
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
                 return Ok(result.Value);
@@ -43,9 +41,7 @@ namespace PlatformaBackend.Controllers
                 UserId = Guid.Parse(HttpContextAccessor.HttpContext!.User.FindFirst("UserId")!.Value)
             });
 
-            if (result == null)
-                return NotFound();
-            if (result.IsSuccess && result.Value == null)
+            if (result == null || (result.IsSuccess && result.Value == null))
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
                 return Ok(result.Value);
@@ -65,9 +61,7 @@ namespace PlatformaBackend.Controllers
 
             Result<Unit?> result = await Mediator.Send(new AcceptUser.Command() { CourseId = courseId, UserId = userId });
 
-            if (result == null)
-                return NotFound();
-            if (result.IsSuccess && result.Value == null)
+            if (result == null || (result.IsSuccess && result.Value == null))
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
                 return Ok(result.Value);
@@ -88,9 +82,7 @@ namespace PlatformaBackend.Controllers
 
             Result<Unit?> result = await Mediator.Send(new RemoveUser.Command() { CourseId = courseId, UserId = userId });
 
-            if (result == null)
-                return NotFound();
-            if (result.IsSuccess && result.Value == null)
+            if (result == null || (result.IsSuccess && result.Value == null))
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
                 return Ok(result.Value);

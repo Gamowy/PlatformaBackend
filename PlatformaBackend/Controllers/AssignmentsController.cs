@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Rewrite;
 using Platforma.Application.Answers;
 using Platforma.Application.Assignments;
 using Platforma.Application.Files;
@@ -21,9 +22,7 @@ namespace PlatformaBackend.Controllers
                 return Forbid();
 
             var result = await Mediator.Send(new GetAssignments.Query { CourseId = courseId });
-            if (result == null)
-                return NotFound();
-            if (result.IsSuccess && result.Value == null)
+            if (result == null || (result.IsSuccess && result.Value == null))
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
             {
@@ -42,9 +41,7 @@ namespace PlatformaBackend.Controllers
         public async Task<ActionResult<Assignment>> GetAssignmentDetails(Guid assignmentId)
         {
             var result = await Mediator.Send(new AssignmentDetails.Query { AssignmentId = assignmentId });
-            if (result == null)
-                return NotFound();
-            if (result.IsSuccess && result.Value == null)
+            if (result == null || (result.IsSuccess && result.Value == null))
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
             {
@@ -67,12 +64,10 @@ namespace PlatformaBackend.Controllers
                 return Forbid();
 
             var result = await Mediator.Send(new CreateAssignment.Command { AssignmentDTO = assignmentDTO });
-            if (result == null)
+            if (result == null || (result.IsSuccess && result.Value == null))
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
                 return Ok(result.Value);
-            if (result.IsSuccess && result.Value == null)
-                return NotFound();
             return BadRequest(result.Error);
         }
 
@@ -87,12 +82,10 @@ namespace PlatformaBackend.Controllers
                 return Forbid();
 
             var result = await Mediator.Send(new EditAssignment.Command { AssignmentId = assignmentId, AssignmentDTO = assignmentDTO });
-            if (result == null)
+            if (result == null || (result.IsSuccess && result.Value == null))
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
                 return Ok(result.Value);
-            if (result.IsSuccess && result.Value == null)
-                return NotFound();
             return BadRequest(result.Error);
         }
 
@@ -135,12 +128,10 @@ namespace PlatformaBackend.Controllers
                 return BadRequest("Couldn't remove assignment data");
 
             var result = await Mediator.Send(new DeleteAssignment.Command { AssignmentId = assignmentId });
-            if (result == null)
+            if (result == null || (result.IsSuccess && result.Value == null))
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
                 return Ok(result.Value);
-            if (result.IsSuccess && result.Value == null)
-                return NotFound();
             return BadRequest(result.Error);
         }
     }
