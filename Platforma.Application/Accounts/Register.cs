@@ -42,6 +42,7 @@ namespace Platforma.Application.Users
                 newUser.Password = new PasswordHasher<User>().HashPassword(newUser, newUser.Password);
                 _context.Users.Add(newUser);
                 var reult = await _context.SaveChangesAsync() > 0;
+                if (!reult) Result<Unit?>.Failure("Failed to add user");
                 return Result<Unit?>.Success(Unit.Value);
             }
 
