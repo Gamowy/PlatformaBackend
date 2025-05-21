@@ -1,14 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Platforma.Application;
 using Platforma.Application.Courses;
+using Platforma.Application.Courses.DTOs;
 using Platforma.Domain;
 
 namespace PlatformaBackend.Controllers
 {
     public class CourseController : BaseAPIController
     {
-
         /// <summary>
         /// Get a list of all courses
         /// </summary>
@@ -16,12 +15,10 @@ namespace PlatformaBackend.Controllers
         public async Task<ActionResult<List<Course>>> GetCourses()
         {
             var result = await Mediator.Send(new CourseList.Query());
-            if (result == null)
+            if (result == null || (result.IsSuccess && result.Value == null))
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
                 return Ok(result.Value);
-            if (result.IsSuccess && result.Value == null)
-                return NotFound();
             return BadRequest(result.Error);
         }
 
@@ -29,16 +26,14 @@ namespace PlatformaBackend.Controllers
         /// Get a list of users for specifed course
         /// </summary>
         [HttpGet("{courseId}/users")]
-        public async Task<ActionResult<List<User>>> GetUsersForCourse(Guid courseId)
+        public async Task<ActionResult<List<UserCourseDTO>>> GetUsersForCourse(Guid courseId)
         {
             var result = await Mediator.Send(new UserList.Query { CourseId = courseId });
 
-            if (result == null)
+            if (result == null || (result.IsSuccess && result.Value == null))
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
                 return Ok(result.Value);
-            if (result.IsSuccess && result.Value == null)
-                return NotFound();
 
             return BadRequest(result.Error);
         }
@@ -51,12 +46,10 @@ namespace PlatformaBackend.Controllers
         {
             var result = await Mediator.Send(new Details.Query { id = courseId });
 
-            if (result == null)
+            if (result == null || (result.IsSuccess && result.Value == null))
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
                 return Ok(result.Value);
-            if (result.IsSuccess && result.Value == null)
-                return NotFound();
             return BadRequest(result.Error);
 
         }
@@ -65,17 +58,18 @@ namespace PlatformaBackend.Controllers
         /// Edit course
         /// </summary>
         [HttpPut("{courseId}")]
-        public async Task<IActionResult> EditCourse(Guid courseId, Course course)
+        [Authorize(Policy = "AdminOrTeacher")]
+        public async Task<IActionResult> EditCourse(Guid courseId, CourseEditDTO course)
         {
-            course.Id = courseId;
-            var result = await Mediator.Send(new Edit.Command { Course = course });
+            if (!await CheckIfAdminOrOwner(courseId))
+                return Forbid();
 
-            if (result == null)
+            var result = await Mediator.Send(new Edit.Command { CourseDTO = course, CourseId = courseId });
+
+            if (result == null || (result.IsSuccess && result.Value == null))
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
                 return Ok(result.Value);
-            if (result.IsSuccess && result.Value == null)
-                return NotFound();
             return BadRequest(result.Error);
         }
 
@@ -83,16 +77,18 @@ namespace PlatformaBackend.Controllers
         /// Create a new course
         /// </summary>
         [HttpPost]
-        public async Task<IActionResult> CreateCourse(Course course)
+        [Authorize(Policy = "AdminOrTeacher")]
+        public async Task<IActionResult> CreateCourse(CourseCreateDTO course)
         {
-            var result = await Mediator.Send(new Create.Command { Course = course });
+            var result = await Mediator.Send(new Create.Command { 
+                CourseDTO = course,
+                UserId = Guid.Parse(HttpContextAccessor.HttpContext!.User.FindFirst("UserId")!.Value)
+            });
 
-            if (result == null)
+            if (result == null || (result.IsSuccess && result.Value == null))
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
                 return Ok(result.Value);
-            if (result.IsSuccess && result.Value == null)
-                return NotFound();
             return BadRequest(result.Error);
         }
 
@@ -100,16 +96,18 @@ namespace PlatformaBackend.Controllers
         /// Delete a course
         /// </summary>
         [HttpDelete("{id}")]
+        [Authorize(Policy = "AdminOrTeacher")]
         public async Task<IActionResult> DeleteCourse(Guid id)
         {
+            if (!await CheckIfAdminOrOwner(id))
+                return Forbid();
+
             var result = await Mediator.Send(new Delete.Command { Id = id });
 
-            if (result == null)
+            if (result == null || (result.IsSuccess && result.Value == null))
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
                 return Ok(result.Value);
-            if (result.IsSuccess && result.Value == null)
-                return NotFound();
             return BadRequest(result.Error);
         }
     }

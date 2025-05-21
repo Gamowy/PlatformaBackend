@@ -1,19 +1,17 @@
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Mvc.Authorization;
-using Microsoft.EntityFrameworkCore;
-using Platforma.Infrastructure;
-using Platforma.Application.Courses;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.IdentityModel.Tokens;
-using System.Text;
-using Microsoft.OpenApi.Models;
-using FluentValidation.AspNetCore;
 using FluentValidation;
+using FluentValidation.AspNetCore;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.AspNetCore.Server.Kestrel.Core;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Platforma.Application.Courses;
 using Platforma.Application.Users;
 using Platforma.Domain;
-using Microsoft.AspNetCore.Server.Kestrel.Core;
-using Microsoft.Extensions.Options;
+using Platforma.Infrastructure;
+using PlatformaBackend.Extensions;
+using System.Text;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -55,7 +53,6 @@ builder.Services.AddAuthorization(options =>
          policy => policy.RequireRole(User.Roles.Teacher, User.Roles.Student));
 });
 
-builder.Services.AddAuthorization();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddControllers();
@@ -65,35 +62,7 @@ builder.Services.AddValidatorsFromAssemblyContaining<CourseValidator>();
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen( c =>
-{
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-        Name = "Authorization",
-        Type = SecuritySchemeType.Http,
-        Scheme = "Bearer",
-        BearerFormat = "JWT",
-        In = ParameterLocation.Header,
-        Description = "Enter JWT Token"
-    });
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-    {
-        {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            new string[]{ }
-        } 
-    });
-    var xmlFile = $"{System.Reflection.Assembly.GetExecutingAssembly().GetName().Name}.xml";
-    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-    c.IncludeXmlComments(xmlPath);
-});
+builder.SwaggerAuth();
 
 builder.Services.AddDbContext<DataContext>(opt =>
 {
@@ -105,16 +74,7 @@ builder.Services.AddDbContext<DataContext>(opt =>
     opt.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
 });
 
-builder.Services.AddCors(opt =>
-{
-    opt.AddPolicy("CorsPolicy", policy =>
-    {
-        policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:3000");
-        policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:7072");
-        policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:80");
-        policy.AllowAnyHeader().AllowAnyMethod().WithOrigins("http://localhost:8080");
-    });
-});
+//CORS nam siê nie przyda
 
 builder.Services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(CourseList.Handler).Assembly));
 
@@ -137,10 +97,8 @@ if (app.Environment.IsDevelopment())
 
 app.UseAuthentication();
 app.UseAuthorization();
-app.UseCors("CorsPolicy");
 
 app.MapControllers();
-app.UseCors("CorsPolicy");
 using var scope = app.Services.CreateScope();
 var service = scope.ServiceProvider;
 

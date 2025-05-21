@@ -1,10 +1,5 @@
 ﻿using FluentValidation;
-using Platforma.Domain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Platforma.Application.Accounts.DTOs;
 
 namespace Platforma.Application.Users
 {

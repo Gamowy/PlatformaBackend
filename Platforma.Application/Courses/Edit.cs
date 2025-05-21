@@ -1,13 +1,6 @@
-﻿using FluentValidation;
-using MediatR;
+﻿using MediatR;
+using Platforma.Application.Courses.DTOs;
 using Platforma.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.ConstrainedExecution;
-using System.Text;
-using System.Threading.Tasks;
-using Platforma.Domain;
 
 namespace Platforma.Application.Courses
 {
@@ -16,7 +9,8 @@ namespace Platforma.Application.Courses
 
         public class Command : IRequest<Result<Unit?>>
         {
-            public required Course Course { get; set; }
+            public required Guid CourseId { get; set; }
+            public required CourseEditDTO CourseDTO { get; set; }
         }
 
         public class Handler : IRequestHandler<Command, Result<Unit?>>
@@ -30,25 +24,17 @@ namespace Platforma.Application.Courses
 
             public async Task<Result<Unit?>> Handle(Command request, CancellationToken cancellationToken)
             {
-                var course = await _context.Courses.FindAsync(request.Course.Id);
-                if (course == null) return null;
+                var course = await _context.Courses.FindAsync(request.CourseId);
+                if (course == null) return Result<Unit?>.Failure("Course to update not found.");
 
-                course.Name = request.Course.Name ?? course.Name;
-                course.Description = request.Course.Description ?? course.Description;
-                course.OwnerId = request.Course.OwnerId;
-                course.AcademicYear= request.Course.AcademicYear ?? course.AcademicYear;
+                course.Name = request.CourseDTO.Name ?? course.Name;
+                course.Description = request.CourseDTO.Description ?? course.Description;
+                course.OwnerId = request.CourseDTO.OwnerId ?? course.OwnerId;
+                course.AcademicYear= request.CourseDTO.AcademicYear ?? course.AcademicYear;
 
                 var result = await _context.SaveChangesAsync() > 0;
                 if (!result) return Result<Unit?>.Failure("Failed to update course.");
                 return Result<Unit?>.Success(Unit.Value);
-            }
-        }
-
-        public class CommandValidator : AbstractValidator<Command>
-        {
-            public CommandValidator()
-            {
-                RuleFor(x => x.Course).SetValidator(new CourseValidator());
             }
         }
     }

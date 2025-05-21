@@ -1,14 +1,9 @@
 ﻿using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Identity;
-using Platforma.Application.Courses;
+using Platforma.Application.Accounts.DTOs;
 using Platforma.Domain;
 using Platforma.Infrastructure;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Platforma.Application.Users
 {
@@ -47,6 +42,7 @@ namespace Platforma.Application.Users
                 newUser.Password = new PasswordHasher<User>().HashPassword(newUser, newUser.Password);
                 _context.Users.Add(newUser);
                 var reult = await _context.SaveChangesAsync() > 0;
+                if (!reult) Result<Unit?>.Failure("Failed to add user");
                 return Result<Unit?>.Success(Unit.Value);
             }
 

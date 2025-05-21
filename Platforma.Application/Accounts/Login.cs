@@ -1,17 +1,13 @@
-﻿using Azure.Core;
-using MediatR;
+﻿using MediatR;
 using Platforma.Infrastructure;
 using Platforma.Domain;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using System.Security.Claims;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using Microsoft.Extensions.Configuration;
+using Platforma.Application.Accounts.DTOs;
 
 namespace Platforma.Application.Users
 {
