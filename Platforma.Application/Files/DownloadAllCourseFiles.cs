@@ -1,6 +1,9 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Platforma.Application.Courses.DTOs;
+using Platforma.Domain;
 using Platforma.Infrastructure;
 using System.IO.Compression;
 
@@ -37,17 +40,76 @@ namespace Platforma.Application.Files
                 string fullPath = Path.Combine(uploadPath, coursePath);
 
                 // Try to send back course files
-                var zipPath = Path.Combine(uploadPath, $"{Guid.NewGuid().ToString()}_{course.Name}.zip");
+                var tempFolderPath = "";
+                var zipPath = "";
                 try
                 {
+                    var courseStudents = course.Users;
+                    var courseOwner = await _context.Users
+                        .FirstOrDefaultAsync(u => u.Id == course.OwnerId, cancellationToken);
+                    var courseOwnerName = courseOwner?.Name ?? "UnknownOwner";
+                    var courseName = course.Name;
+                    var courseYear = course.AcademicYear.Replace("/", "");
+
+                    var courseAssignments = await _context.Assignments
+                        .Where(x => x.CourseId == request.CourseId)
+                        .ToListAsync(cancellationToken);
+
                     if (!Directory.Exists(fullPath))
                     {
                         return Result<FileContentResult>.Failure("Course files not found");
                     }
-                    // Create the ZIP file
-                    DeleteZip(zipPath);
-                    ZipFile.CreateFromDirectory(fullPath, zipPath, CompressionLevel.Fastest, true);
 
+
+                    // Create temp folder to store course files
+                    tempFolderPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+                    if (Directory.Exists(tempFolderPath))
+                    {
+                        Directory.Delete(tempFolderPath, true);
+                    }
+                    Directory.CreateDirectory(tempFolderPath);
+
+                    // Copy course files to temp folder
+                    CopyDirectory(fullPath, tempFolderPath, true);
+                    if (Directory.Exists(Path.Combine(tempFolderPath, "answers")))
+                    {
+                        var answerDirectories = Directory.GetDirectories(Path.Combine(tempFolderPath, "answers"));
+                        foreach (var answerDirectory in answerDirectories)
+                        {
+                            var directoryName = Path.GetFileName(answerDirectory);
+                            var assignmentName = courseAssignments
+                                .FirstOrDefault(a => a.Id.ToString() == directoryName)?.Name ?? "UnknownAssignment";
+
+                            Directory.Move(answerDirectory, Path.Combine(tempFolderPath, "answers", assignmentName));
+
+                            var usersDirectories = Directory.GetDirectories(Path.Combine(tempFolderPath, "answers", assignmentName));
+                            foreach (var userDirectory in usersDirectories)
+                            {
+                                var userId = Path.GetFileName(userDirectory);
+                                var user = courseStudents?.FirstOrDefault(u => u.Id.ToString() == userId);
+                                if (user != null)
+                                {
+                                    Directory.Move(userDirectory, Path.Combine(tempFolderPath, "answers", assignmentName, user.Name));
+                                }
+
+                            }
+                        }
+                    }
+                    if (Directory.Exists(Path.Combine(tempFolderPath, "assignments")))
+                    {
+                        var assignmentDirectories = Directory.GetDirectories(Path.Combine(tempFolderPath, "assignments"));
+                        foreach (var assignmentDirectory in assignmentDirectories)
+                        {
+                            var directoryName = Path.GetFileName(assignmentDirectory);
+                            var assignmentName = courseAssignments
+                                .FirstOrDefault(a => a.Id.ToString() == directoryName)?.Name ?? "UnknownAssignment";
+                            Directory.Move(assignmentDirectory, Path.Combine(tempFolderPath, "assignments", assignmentName));
+                        }
+                    }
+
+
+                    zipPath = Path.Combine(Path.GetTempPath(), $"{courseOwnerName}_{courseName}_{courseYear}.zip");
+                    ZipFile.CreateFromDirectory(tempFolderPath, zipPath, CompressionLevel.Fastest, false);
                     var mimeType = "application/zip";
                     byte[]? fileBytes;
 
@@ -63,28 +125,65 @@ namespace Platforma.Application.Files
                         {
                             var file = new FileContentResult(fileBytes, mimeType)
                             {
-                                FileDownloadName = Path.GetFileName(zipPath).Substring(37)
+                                FileDownloadName = Path.GetFileName(zipPath)
                             };
                             return Result<FileContentResult>.Success(file);
                         }
                         return Result<FileContentResult>.Failure("Failed to retrive course files");
                     }
                 }
-                catch
+                catch (Exception e)
                 {
-                    return Result<FileContentResult>.Failure("Error retrieving course files");
+                    return Result<FileContentResult>.Failure($"Error retrieving course files: {e}");
                 }
                 finally
                 {
-                    DeleteZip(zipPath);
+                    DeleteTempFiles(zipPath, tempFolderPath);
                 }
             }
 
-            private void DeleteZip(string zipPath)
+            private void DeleteTempFiles(string tempPath, string zipPath)
             {
                 if (File.Exists(zipPath))
                 {
                     File.Delete(zipPath);
+                }
+                if (Directory.Exists(tempPath))
+                {
+                    Directory.Delete(tempPath, true);
+                }
+            }
+
+            private void CopyDirectory(string sourceDir, string destinationDir, bool recursive)
+            {
+                // Get information about the source directory
+                var dir = new DirectoryInfo(sourceDir);
+
+                // Check if the source directory exists
+                if (!dir.Exists)
+                    throw new DirectoryNotFoundException($"Source directory not found: {dir.FullName}");
+
+                // Cache directories before we start copying
+                DirectoryInfo[] dirs = dir.GetDirectories();
+
+                // Create the destination directory
+                Directory.CreateDirectory(destinationDir);
+
+                // Get the files in the source directory and copy to the destination directory
+                foreach (FileInfo file in dir.GetFiles())
+                {
+                    string targetFilePath = Path.Combine(destinationDir, file.Name.Substring(37));
+                    file.CopyTo(targetFilePath);
+                }
+
+                // If recursive and copying subdirectories, recursively call this method
+                if (recursive)
+                {
+                    foreach (DirectoryInfo subDir in dirs)
+                    {
+                        string newDestinationDir = Path.Combine(destinationDir, subDir.Name);
+                        CopyDirectory(subDir.FullName, newDestinationDir, true);
+                    }
                 }
             }
         }
