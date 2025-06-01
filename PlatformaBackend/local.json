@@ -5,7 +5,7 @@
     "Key": "SpokojnieWFinalnymProgramieNieBedzieTuKlucza"
   },
   "ConnectionStrings": {
-    "DefaultConnection": "Server=localhost;Database=PlatformaBaza;User Id=root;Password=Zaq12wsx"
+    "DefaultConnection": "Server=localhost;Database=PlatformaBaza;User Id=root;Password=1234;Port=5010"
   },
   "FileStorageConfig": {
     "Path": "Data/Files",
