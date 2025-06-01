@@ -22,7 +22,7 @@ namespace Platforma.Application.Courses
 
             public async Task<Result<List<Course>>> Handle(Query request, CancellationToken cancellationToken)
             {
-                var result = await _context.Courses.ToListAsync();
+                var result = await _context.Courses.Include(c => c.Owner).ToListAsync();
                 return Result<List<Course>>.Success(result);
             }
         }

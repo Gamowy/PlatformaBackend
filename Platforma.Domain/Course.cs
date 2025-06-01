@@ -9,7 +9,7 @@ namespace Platforma.Domain
         public string Name { get; set; }
         public string Description { get; set; }
         public Guid OwnerId { get; set; }
-        [JsonIgnore]
+        //[JsonIgnore]
         public User? Owner { get; set; }
         public string AcademicYear { get; set; }
         [JsonIgnore]
