@@ -27,7 +27,7 @@ namespace PlatformaBackend.Controllers
         /// <summary>
         /// Get a list of all courses that user participate in
         /// </summary>
-        [HttpGet("/myCourses")]
+        [HttpGet("myCourses")]
         public async Task<ActionResult<List<Course>>> GetUsersCourses()
         {
             if (HttpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.Role)!.Value.Equals(Platforma.Domain.User.Roles.Administrator))
