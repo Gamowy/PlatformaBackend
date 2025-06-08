@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Platforma.Application;
 using Platforma.Application.Courses;
 using Platforma.Application.Courses.DTOs;
 using Platforma.Domain;
+using System.Security.Claims;
 
 namespace PlatformaBackend.Controllers
 {
@@ -28,6 +30,9 @@ namespace PlatformaBackend.Controllers
         [HttpGet("/myCourses")]
         public async Task<ActionResult<List<Course>>> GetUsersCourses()
         {
+            if (HttpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.Role)!.Value.Equals(Platforma.Domain.User.Roles.Administrator))
+                return await GetAllCourses();
+
             var result = await Mediator.Send(new CourseListForUser.Query 
                 { UserId = Guid.Parse(HttpContextAccessor.HttpContext!.User.FindFirst("UserId")!.Value) });
 
