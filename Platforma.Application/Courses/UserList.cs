@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Platforma.Application.Courses.DTOs;
 using Platforma.Domain;
 using Platforma.Infrastructure;
+using System.Diagnostics;
 
 namespace Platforma.Application.Courses
 {
@@ -33,9 +34,19 @@ namespace Platforma.Application.Courses
                     return Result<List<UserCourseDTO>>.Failure("Course not found.");
                 }
 
-                List<UserCourseDTO> list = course.Users.Select(u => new UserCourseDTO(u.Id, u.StudentIdNumber, u.Username, u.Name, u.UserType,
-                    (_context.CourseUsers.Where(cu => cu.CourseID == request.CourseId && cu.UserID == u.Id).FirstOrDefault().Status ?? UserStatus.Awaiting)
-                    )).ToList();
+                List<UserCourseDTO> list = [];
+
+                try
+                {
+                    list = course.Users!.Select(u => new UserCourseDTO(u.Id, u.StudentIdNumber, u.Username, u.Name, u.UserType,
+                        (_context.CourseUsers.Where(cu => cu.CourseID == request.CourseId && cu.UserID == u.Id).FirstOrDefault()!.Status ?? UserStatus.Awaiting)
+                        )).ToList();
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine(ex);
+                    return Result<List<UserCourseDTO>>.Failure("Course not found.");
+                }
 
                 return Result<List<UserCourseDTO>>.Success(list);
             }
