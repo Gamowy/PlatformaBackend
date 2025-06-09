@@ -26,7 +26,7 @@ namespace Platforma.Application.Users
 
             public async Task<Result<Unit?>> Handle(Command request, CancellationToken cancellationToken)
             {
-                var found = _context.Users.Where(u => u.Username == request.UserRegisterDTO.UserName).FirstOrDefault();
+                var found = _context.Users.Where(u => u.Username == request.UserRegisterDTO.Username).FirstOrDefault();
                 if (found != null)
                 {
                     return Result<Unit?>.Failure("User with this username already exists");
@@ -36,7 +36,8 @@ namespace Platforma.Application.Users
                 {
                     Name = request.UserRegisterDTO.Name + " " + request.UserRegisterDTO.Surname,
                     Password = request.UserRegisterDTO.Password,
-                    Username = request.UserRegisterDTO.UserName,
+                    Username = request.UserRegisterDTO.Username,
+                    StudentIdNumber = request.UserRegisterDTO.StudentIdNumber,
                     UserType = User.Roles.Student
                 };
                 newUser.Password = new PasswordHasher<User>().HashPassword(newUser, newUser.Password);

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Platforma.Application.Accounts;
 using Platforma.Application.Accounts.DTOs;
 using Platforma.Application.Users;
+using System.Security.Claims;
 
 namespace PlatformaBackend.Controllers
 {
@@ -52,6 +53,20 @@ namespace PlatformaBackend.Controllers
             if (result.IsSuccess && result.Value != null)
                 return Ok(result.Value);
             return BadRequest(result.Error);
+        }
+
+        /// <summary>
+        /// Validate token
+        /// </summary>
+        [HttpGet("validate")]
+        public ActionResult<Boolean?> ValidateToken()
+        {
+            var context = HttpContextAccessor.HttpContext;
+            if (context == null) return Ok(false);
+            var expiration = context.User.FindFirstValue("exp");
+            if (expiration == null) return Ok(false);
+
+            return Ok(DateTimeOffset.FromUnixTimeSeconds(long.Parse(expiration)) > DateTime.UtcNow);
         }
     }
 }
