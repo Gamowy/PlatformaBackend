@@ -11,6 +11,7 @@ using Platforma.Application.Users;
 using Platforma.Domain;
 using Platforma.Infrastructure;
 using PlatformaBackend.Extensions;
+using System.Diagnostics;
 using System.Text;
 
 
@@ -67,9 +68,10 @@ builder.SwaggerAuth();
 builder.Services.AddDbContext<DataContext>(opt =>
 {
     var isRunningInContainer = Environment.GetEnvironmentVariable("RUNNING_IN_CONTAINER") == "true";
+    var dockerServerName = Environment.GetEnvironmentVariable("DOCKER_DB_SERVER") ?? "database";
+    Debug.WriteLine("KAPSALON: " + isRunningInContainer + " A " + dockerServerName);
     var connectionString = isRunningInContainer
-        ? Environment.GetEnvironmentVariable("DOCKER_CONNECTION_STRING")
-        ?? builder.Configuration.GetConnectionString("DockerConnection")
+        ? "Server="+ dockerServerName+";" + builder.Configuration.GetConnectionString("DockerConnection")
         : builder.Configuration.GetConnectionString("DefaultConnection");
     opt.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
 });
