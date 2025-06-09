@@ -11,12 +11,17 @@ services:
           - internal-network
         volumes:
           - mariadb_data:/var/lib/mysql
+        healthcheck:
+          test: mariadb-admin ping -h 127.0.0.1 -u root -p1234
+          interval: 5s
+          timeout: 5s
+          retries: 5
     backend:
         build: .
         container_name: backend
         environment:
           RUNNING_IN_CONTAINER: true
-          DOCKER_DB_SERVER: database
+          DOCKER_CONNECTION_STRING: "Server=database;Database=PlatformaBaza;User Id=root;Password=1234;Port=3306"
         ports:
           - 5247:8080
         networks:
@@ -24,7 +29,8 @@ services:
         links:
           - database
         depends_on:
-          -  database
+          database:
+            condition: service_healthy
 volumes:
     mariadb_data:
 networks:

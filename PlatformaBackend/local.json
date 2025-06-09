@@ -6,7 +6,7 @@
   },
   "ConnectionStrings": {
     "DefaultConnection": "Server=localhost;Database=PlatformaBaza;User Id=root;Password=1234;Port=5010",
-    "DockerConnection": "Database=PlatformaBaza;User Id=root;Password=1234;Port=3306"
+    "DockerConnection": "Server=database;Database=PlatformaBaza;User Id=root;Password=1234;Port=3306"
   },
   "FileStorageConfig": {
     "Path": "Data/Files",
