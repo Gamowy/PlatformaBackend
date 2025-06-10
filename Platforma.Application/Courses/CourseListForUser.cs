@@ -34,7 +34,7 @@ namespace Platforma.Application.Courses
 
                 var courseIds = userCourses.Select(uc => uc.CourseID).ToList();
 
-                var result = await _context.Courses.Where(c => courseIds.Contains(c.Id) || c.OwnerId.Equals(request.UserId)).ToListAsync(cancellationToken);
+                var result = await _context.Courses.Where(c => courseIds.Contains(c.Id) || c.OwnerId.Equals(request.UserId)).Include(c => c.Owner).ToListAsync(cancellationToken);
 
                 return Result<List<Course>>.Success(result);
             }
