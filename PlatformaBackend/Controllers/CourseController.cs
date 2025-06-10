@@ -49,7 +49,23 @@ namespace PlatformaBackend.Controllers
         [HttpGet("{courseId}/users")]
         public async Task<ActionResult<List<UserCourseDTO>>> GetUsersForCourse(Guid courseId)
         {
-            var result = await Mediator.Send(new UserList.Query { CourseId = courseId });
+            var result = await Mediator.Send(new UserList.Query { CourseId = courseId, onlyAccepted = false });
+
+            if (result == null || (result.IsSuccess && result.Value == null))
+                return NotFound();
+            if (result.IsSuccess && result.Value != null)
+                return Ok(result.Value);
+
+            return BadRequest(result.Error);
+        }
+
+        /// <summary>
+        /// Get a list of accepted users for specifed course
+        /// </summary>
+        [HttpGet("{courseId}/AcceptedUsers")]
+        public async Task<ActionResult<List<UserCourseDTO>>> GetAcceptedUsersForCourse(Guid courseId)
+        {
+            var result = await Mediator.Send(new UserList.Query { CourseId = courseId, onlyAccepted = true });
 
             if (result == null || (result.IsSuccess && result.Value == null))
                 return NotFound();

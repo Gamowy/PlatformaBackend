@@ -31,6 +31,29 @@ namespace PlatformaBackend.Controllers
         }
 
         /// <summary>
+        /// Get all answers of a user in a given course
+        /// </summary>
+        [HttpGet("course/{courseId}/user")]
+        [Authorize]
+        public async Task<ActionResult<List<Answer>>> GetAllAnswersForUserInCourse(Guid courseId)
+        {
+            var finalUserId = Guid.Parse(HttpContextAccessor.HttpContext!.User.FindFirst("UserId")!.Value);
+
+            var result = await Mediator.Send(new GetAllAnswerForUserInCourse.Query
+            {
+                CourseId = courseId,
+                UserId = finalUserId
+            });
+
+            if (!result.IsSuccess)
+                return BadRequest(result.Error);
+
+            return Ok(result.Value);
+        }
+
+
+
+        /// <summary>
         /// Get details about specified answer
         /// </summary>
         [HttpGet("details/{answerId}")]
@@ -74,5 +97,8 @@ namespace PlatformaBackend.Controllers
                 return Ok(result.Value);
             return BadRequest(result.Error);
         }
+
+
+
     }
 }

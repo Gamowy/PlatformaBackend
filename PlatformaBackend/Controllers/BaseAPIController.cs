@@ -41,8 +41,7 @@ namespace PlatformaBackend.Controllers
             if(await CheckIfAdminOrOwner(courseId))
                 return true;
 
-            //lub uczestnik
-            var courseUsers = await Mediator.Send(new Platforma.Application.Courses.UserList.Query { CourseId = courseId });
+            var courseUsers = await Mediator.Send(new Platforma.Application.Courses.UserList.Query { CourseId = courseId,onlyAccepted = false });
             if (courseUsers.IsSuccess &&
                 courseUsers.Value.Where(u => u.Id.Equals(Guid.Parse(HttpContextAccessor.HttpContext!.User.FindFirst("UserId")!.Value)) &&
                 u.status == UserStatus.Accepted).FirstOrDefault() != null)
