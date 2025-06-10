@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Platforma.Application.Courses.DTOs;
 using Platforma.Domain;
 using Platforma.Infrastructure;
+using System.Diagnostics;
 
 namespace Platforma.Application.Courses
 {
@@ -33,24 +34,29 @@ namespace Platforma.Application.Courses
                 {
                     return Result<List<UserCourseDTO>>.Failure("Course not found.");
                 }
-                List<UserCourseDTO> list;
+                List<UserCourseDTO> list = [];
 
-                if (request.onlyAccepted)
+                try
                 {
-                    list = course.Users.Where(u =>(_context.CourseUsers.FirstOrDefault(cu => cu.CourseID == request.CourseId && cu.UserID == u.Id)?.Status ?? UserStatus.Awaiting) == UserStatus.Accepted)
-                    .Select(u => new UserCourseDTO(u.Id, u.StudentIdNumber, u.Username, u.Name, u.UserType,
-                        (_context.CourseUsers.Where(cu => cu.CourseID == request.CourseId && cu.UserID == u.Id).FirstOrDefault().Status ?? UserStatus.Awaiting)
-                   )).ToList();
+                  if (request.onlyAccepted)
+                  {
+                      list = course.Users.Where(u =>(_context.CourseUsers.FirstOrDefault(cu => cu.CourseID == request.CourseId && cu.UserID == u.Id)?.Status ?? UserStatus.Awaiting) == UserStatus.Accepted)
+                      .Select(u => new UserCourseDTO(u.Id, u.StudentIdNumber, u.Username, u.Name, u.UserType,
+                          (_context.CourseUsers.Where(cu => cu.CourseID == request.CourseId && cu.UserID == u.Id).FirstOrDefault().Status ?? UserStatus.Awaiting)
+                     )).ToList();
+                  }
+                  else
+                  {
+                      list = course.Users.Select(u => new UserCourseDTO(u.Id, u.StudentIdNumber, u.Username, u.Name, u.UserType,
+                          (_context.CourseUsers.Where(cu => cu.CourseID == request.CourseId && cu.UserID == u.Id).FirstOrDefault().Status ?? UserStatus.Awaiting)
+                          )).ToList();
+                  }
                 }
-                else
+                catch (Exception ex)
                 {
-                    list = course.Users.Select(u => new UserCourseDTO(u.Id, u.StudentIdNumber, u.Username, u.Name, u.UserType,
-                        (_context.CourseUsers.Where(cu => cu.CourseID == request.CourseId && cu.UserID == u.Id).FirstOrDefault().Status ?? UserStatus.Awaiting)
-                        )).ToList();
+                    Debug.WriteLine(ex);
+                    return Result<List<UserCourseDTO>>.Failure("Course not found.");
                 }
-
-                
-
 
                 return Result<List<UserCourseDTO>>.Success(list);
             }

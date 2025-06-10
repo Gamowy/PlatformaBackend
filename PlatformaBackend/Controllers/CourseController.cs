@@ -1,8 +1,10 @@
 ﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Platforma.Application;
 using Platforma.Application.Courses;
 using Platforma.Application.Courses.DTOs;
 using Platforma.Domain;
+using System.Security.Claims;
 
 namespace PlatformaBackend.Controllers
 {
@@ -12,9 +14,28 @@ namespace PlatformaBackend.Controllers
         /// Get a list of all courses
         /// </summary>
         [HttpGet]
-        public async Task<ActionResult<List<Course>>> GetCourses()
+        public async Task<ActionResult<List<Course>>> GetAllCourses()
         {
             var result = await Mediator.Send(new CourseList.Query());
+            if (result == null || (result.IsSuccess && result.Value == null))
+                return NotFound();
+            if (result.IsSuccess && result.Value != null)
+                return Ok(result.Value);
+            return BadRequest(result.Error);
+        }
+
+        /// <summary>
+        /// Get a list of all courses that user participate in
+        /// </summary>
+        [HttpGet("myCourses")]
+        public async Task<ActionResult<List<Course>>> GetUsersCourses()
+        {
+            if (HttpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.Role)!.Value.Equals(Platforma.Domain.User.Roles.Administrator))
+                return await GetAllCourses();
+
+            var result = await Mediator.Send(new CourseListForUser.Query 
+                { UserId = Guid.Parse(HttpContextAccessor.HttpContext!.User.FindFirst("UserId")!.Value) });
+
             if (result == null || (result.IsSuccess && result.Value == null))
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
@@ -64,7 +85,8 @@ namespace PlatformaBackend.Controllers
 
             if (result == null || (result.IsSuccess && result.Value == null))
                 return NotFound();
-            if (result.IsSuccess && result.Value != null)
+            if (result.IsSuccess && result.Value != null 
+                && await UserParticipateInCourse(courseId))
                 return Ok(result.Value);
             return BadRequest(result.Error);
 

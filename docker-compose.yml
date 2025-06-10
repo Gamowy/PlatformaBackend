@@ -1,13 +1,37 @@
 services:
     database:
         image: mariadb
-        container_name: PlatformaBaza
+        container_name: database
         environment:
-            MARIADB_ROOT_PASSWORD: 1234
-            MARIADB_DATABASE: PlatformaBaza
+          MARIADB_ROOT_PASSWORD: 1234
+          MARIADB_DATABASE: PlatformaBaza
         ports:
-            - 5010:3306
+          - 5010:3306
+        networks:
+          - internal-network
         volumes:
-            - mariadb_data:/var/lib/mysql
+          - mariadb_data:/var/lib/mysql
+        healthcheck:
+          test: mariadb-admin ping -h 127.0.0.1 -u root -p1234
+          interval: 5s
+          timeout: 5s
+          retries: 5
+    backend:
+        build: .
+        container_name: backend
+        environment:
+          RUNNING_IN_CONTAINER: true
+          DOCKER_CONNECTION_STRING: "Server=database;Database=PlatformaBaza;User Id=root;Password=1234;Port=3306"
+        ports:
+          - 5247:8080
+        networks:
+          - internal-network
+        links:
+          - database
+        depends_on:
+          database:
+            condition: service_healthy
 volumes:
     mariadb_data:
+networks:
+  internal-network: {}
