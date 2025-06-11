@@ -2,7 +2,6 @@
 
 namespace Platforma.Domain
 {
-    //public enum UserType { Student, Teacher, Administrator }
 
     public class User 
     {
@@ -23,6 +22,7 @@ namespace Platforma.Domain
         {
             public const string Administrator = "Administrator";
             public const string Teacher = "Teacher";
+            public const string TeacherApplicant = "TeacherApplicant";
             public const string Student = "Student";
         }
     }
