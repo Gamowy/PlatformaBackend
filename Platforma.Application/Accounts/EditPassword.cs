@@ -30,7 +30,7 @@ namespace Platforma.Application.Accounts
                 if (user != null)
                 {
                     if (new PasswordHasher<User>().VerifyHashedPassword(user, user.Password, request.PassResetDTO.OldPassword) != PasswordVerificationResult.Success)
-                        return Result<Unit?>.Failure("incorrect old password");
+                        return Result<Unit?>.Failure("Incorrect old password");
 
                     user.Password = new PasswordHasher<User>().HashPassword(user, request.PassResetDTO.NewPassword);
 

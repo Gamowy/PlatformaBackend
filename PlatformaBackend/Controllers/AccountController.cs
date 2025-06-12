@@ -64,9 +64,16 @@ namespace PlatformaBackend.Controllers
         /// Used to get user role
         /// </summary>
         [HttpGet("role")]
-        public IActionResult GetRole()
+        public async Task<IActionResult> GetRole()
         {
-            return Ok(HttpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.Role)!.Value);
+            var result = await Mediator.Send(new Role.Query
+            {
+                UserId = Guid.Parse(HttpContextAccessor.HttpContext!.User.FindFirst("UserId")!.Value)
+            });
+
+            if (result == null)
+                return NotFound();
+            return Ok(result.Value);
         }
 
         /// <summary>
