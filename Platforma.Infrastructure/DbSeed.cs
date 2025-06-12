@@ -106,6 +106,7 @@ namespace Platforma.Infrastructure
                 Course = testCourse,
                 OpenDate = DateTime.UtcNow.AddDays(-3),
                 Deadline = DateTime.UtcNow.AddDays(4),
+                FileName = "Task.docx",
                 FilePath = "Example/Assigments1/d020b3f1-c741-4d63-baff-c7f473433b26_Task.docx",
                 AcceptedFileTypes = ".zip;.pdf;.docx.;.txt"
             };
@@ -129,6 +130,7 @@ namespace Platforma.Infrastructure
             {
                 Assignment = testAssignment,
                 User = testUser,
+                FileName = "Answer1.docx",
                 FilePath = "Example/Assigments1/d020b3f1-c741-4d63-baff-c7f473433b26_Answer1.docx",
             };
 

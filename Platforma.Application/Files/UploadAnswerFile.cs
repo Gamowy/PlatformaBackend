@@ -92,6 +92,7 @@ namespace Platforma.Application.Files
                     }
                     // Save file path reference in database
                     newAnswer.FilePath = filePath;
+                    newAnswer.FileName = request.File.FileName;
                     newAnswer.SubmittedDate = DateTime.UtcNow;
                     _context.Answers.Add(newAnswer);
                     var result = await _context.SaveChangesAsync() > 0;

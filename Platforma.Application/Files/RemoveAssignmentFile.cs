@@ -35,6 +35,7 @@ namespace Platforma.Application.Files
 
                 // Clear file path reference in database
                 assignment.FilePath = "";
+                assignment.FileName = "";
                 var result = await _context.SaveChangesAsync(cancellationToken) > 0;
 
                 // Delete file

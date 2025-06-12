@@ -12,6 +12,7 @@ namespace Platforma.Domain
         public string Content { get; set; }
         public DateTime? OpenDate { get; set; }
         public DateTime Deadline { get; set; }
+        public string FileName { get; set; }
         [JsonIgnore]
         public string FilePath { get; set; }
         public bool AnswerRequired { get; set; } = true;

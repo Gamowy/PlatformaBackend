@@ -62,6 +62,7 @@ namespace Platforma.Application.Files
                     }
                     // Save file path reference in database
                     assignment.FilePath = filePath;
+                    assignment.FileName = request.File.FileName;
                     var result = await _context.SaveChangesAsync() > 0;
                     if (!result)
                     {
