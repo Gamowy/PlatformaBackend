@@ -76,6 +76,25 @@ namespace PlatformaBackend.Controllers
         }
 
         /// <summary>
+        /// Get a list of accepted users for specifed course
+        /// </summary>
+        [HttpGet("{courseId}/UnacceptedUsers")]
+        public async Task<ActionResult<List<UserCourseDTO>>> GetUnacceptedUsersForCourse(Guid courseId)
+        {
+            var result = await Mediator.Send(new UserList.Query { CourseId = courseId, onlyAccepted = false });
+
+            if (result == null || (result.IsSuccess && result.Value == null))
+                return NotFound();
+            if (result.IsSuccess && result.Value != null)
+            {
+                var list = result.Value.Where(u => u.status.Equals(UserStatus.Awaiting)).ToList();
+                return Ok(list);
+            }
+
+            return BadRequest(result.Error);
+        }
+
+        /// <summary>
         /// Get details about specified course
         /// </summary>
         [HttpGet("{courseId}")] 
