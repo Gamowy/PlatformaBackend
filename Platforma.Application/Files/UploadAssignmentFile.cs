@@ -37,7 +37,7 @@ namespace Platforma.Application.Files
                 }
 
                 // Check file size
-                int maxFileSize = Int32.Parse(_configuration["FileStorageConfig:MaxFileSize"]!); 
+                int maxFileSize = Int32.Parse(_configuration["FileStorageConfig:MaxFileSize"]!);
                 if (request.File.Length > maxFileSize)
                 {
                     return Result<Unit?>.Failure("File size exceeds the limit");
@@ -71,25 +71,10 @@ namespace Platforma.Application.Files
                 }
                 catch (Exception ex)
                 {
-                    RollbackFileUpload(fullPath);
+                    FilesUtils.RollbackFileUpload(fullPath);
                     return Result<Unit?>.Failure($"Error saving file: {ex}");
                 }
                 return Result<Unit?>.Success(Unit.Value);
-            }
-
-            // Rollback file upload if error occurs
-            private void RollbackFileUpload(string fullPath)
-            {
-                try
-                {
-                    if (File.Exists(fullPath))
-                    {
-                        File.Delete(fullPath);
-                    }
-                }
-                catch { 
-                    Console.WriteLine($"Error deleting file during rollback");
-                }
             }
         }
     }

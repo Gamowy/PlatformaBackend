@@ -41,6 +41,7 @@ namespace Platforma.Application.Files
                 if (File.Exists(fullPath))
                 {
                     File.Delete(fullPath);
+                    FilesUtils.DeleteEmptyDirectoriesUpwards(fullPath);
                 }
                 if (!result) return Result<Unit?>.Failure("Failed to delete assignment file");
                 return Result<Unit?>.Success(Unit.Value);
