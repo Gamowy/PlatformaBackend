@@ -51,8 +51,6 @@ namespace PlatformaBackend.Controllers
             return Ok(result.Value);
         }
 
-
-
         /// <summary>
         /// Get details about specified answer
         /// </summary>
@@ -69,6 +67,24 @@ namespace PlatformaBackend.Controllers
                 else
                     return Forbid();
             }
+            return BadRequest(result.Error);
+        }
+
+        /// <summary>
+        /// Get number of marked and unmarked answers for each assignment in a course
+        /// </summary>
+        [HttpGet("course/{courseId}/count")]
+        [Authorize(Roles = Platforma.Domain.User.Roles.Teacher)]
+        public async Task<ActionResult<NumberOfAnswersDTO>> GetNumberOfAnswers(Guid courseId)
+        {
+            if (!await UserParticipateInCourse(courseId))
+                return Forbid();
+
+            var result = await Mediator.Send(new GetNumberOfAnswers.Query { CourseId = courseId });
+            if (result == null || (result.IsSuccess && result.Value == null))
+                return NotFound();
+            if (result.IsSuccess && result.Value != null)
+                return Ok(result.Value);
             return BadRequest(result.Error);
         }
 
@@ -97,8 +113,5 @@ namespace PlatformaBackend.Controllers
                 return Ok(result.Value);
             return BadRequest(result.Error);
         }
-
-
-
     }
 }

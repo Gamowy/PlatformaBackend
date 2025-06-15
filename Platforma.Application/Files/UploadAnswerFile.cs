@@ -92,7 +92,8 @@ namespace Platforma.Application.Files
                     }
                     // Save file path reference in database
                     newAnswer.FilePath = filePath;
-                    newAnswer.SubmittedDate = DateTime.UtcNow;
+                    newAnswer.FileName = request.File.FileName;
+                    newAnswer.SubmittedDate = DateTime.UtcNow.ToUniversalTime();
                     _context.Answers.Add(newAnswer);
                     var result = await _context.SaveChangesAsync() > 0;
                     if (!result)
@@ -102,26 +103,10 @@ namespace Platforma.Application.Files
                 }
                 catch (Exception ex)
                 {
-                    RollbackFileUpload(fullPath);
+                    FilesUtils.RollbackFileUpload(fullPath);
                     return Result<Unit?>.Failure($"Error saving file: {ex}");
                 }
                 return Result<Unit?>.Success(Unit.Value);
-            }
-
-            // Rollback file upload if error occurs
-            private void RollbackFileUpload(string fullPath)
-            {
-                try
-                {
-                    if (File.Exists(fullPath))
-                    {
-                        File.Delete(fullPath);
-                    }
-                }
-                catch
-                {
-                    Console.WriteLine($"Error deleting file durign rollback");
-                }
             }
         }
 

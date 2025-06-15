@@ -34,8 +34,9 @@ namespace Platforma.Application.Assignments
                     CourseId = request.AssignmentDTO.CourseId,
                     Name = request.AssignmentDTO.AssignmentName ?? "New assignment",
                     Content = request.AssignmentDTO.AssignmentContent ?? "Assigment description",
-                    OpenDate = request.AssignmentDTO.OpenDate ?? DateTime.UtcNow,
-                    Deadline = request.AssignmentDTO.Deadline ?? DateTime.UtcNow.AddDays(7),
+                    OpenDate = request.AssignmentDTO.OpenDate,
+                    Deadline = request.AssignmentDTO.Deadline,
+                    FileName = "",
                     FilePath = "",
                     AcceptedFileTypes = request.AssignmentDTO.AcceptedFileTypes ?? ".txt;.docx;.pdf;.zip",
                     AnswerRequired = request.AssignmentDTO.AnswerRequired ?? false
