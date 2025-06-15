@@ -78,20 +78,29 @@ namespace Platforma.Application.Files
                         {
                             var directoryName = Path.GetFileName(answerDirectory);
                             var assignmentName = courseAssignments
-                                .FirstOrDefault(a => a.Id.ToString() == directoryName)?.Name ?? "UnknownAssignment";
+                                .FirstOrDefault(a => a.Id.ToString() == directoryName)?.Name;
 
-                            Directory.Move(answerDirectory, Path.Combine(tempFolderPath, "answers", assignmentName));
-
-                            var usersDirectories = Directory.GetDirectories(Path.Combine(tempFolderPath, "answers", assignmentName));
-                            foreach (var userDirectory in usersDirectories)
+                            if (assignmentName != null)
                             {
-                                var userId = Path.GetFileName(userDirectory);
-                                var user = courseStudents?.FirstOrDefault(u => u.Id.ToString() == userId);
-                                if (user != null)
+                                Directory.Move(answerDirectory, Path.Combine(tempFolderPath, "answers", assignmentName));
+                                var usersDirectories = Directory.GetDirectories(Path.Combine(tempFolderPath, "answers", assignmentName));
+                                foreach (var userDirectory in usersDirectories)
                                 {
-                                    Directory.Move(userDirectory, Path.Combine(tempFolderPath, "answers", assignmentName, user.Name));
+                                    var userId = Path.GetFileName(userDirectory);
+                                    var user = courseStudents?.FirstOrDefault(u => u.Id.ToString() == userId);
+                                    if (user != null)
+                                    {
+                                        Directory.Move(userDirectory, Path.Combine(tempFolderPath, "answers", assignmentName, user.Name));
+                                    }
+                                    else
+                                    {
+                                        Directory.Delete(userDirectory, true);
+                                    }
                                 }
-
+                            }
+                            else
+                            {
+                                Directory.Delete(answerDirectory, true);
                             }
                         }
                     }
@@ -102,13 +111,23 @@ namespace Platforma.Application.Files
                         {
                             var directoryName = Path.GetFileName(assignmentDirectory);
                             var assignmentName = courseAssignments
-                                .FirstOrDefault(a => a.Id.ToString() == directoryName)?.Name ?? "UnknownAssignment";
-                            Directory.Move(assignmentDirectory, Path.Combine(tempFolderPath, "assignments", assignmentName));
+                                .FirstOrDefault(a => a.Id.ToString() == directoryName)?.Name;
+                            if (assignmentName != null)
+                            {
+                                Directory.Move(assignmentDirectory, Path.Combine(tempFolderPath, "assignments", assignmentName));
+                            }
+                            else
+                            {
+                                Directory.Delete(assignmentDirectory, true);
+                            }
                         }
                     }
 
-
                     zipPath = Path.Combine(Path.GetTempPath(), $"{courseOwnerName}_{courseName}_{courseYear}.zip");
+                    if(File.Exists(zipPath))
+                    {
+                        File.Delete(zipPath);
+                    }
                     ZipFile.CreateFromDirectory(tempFolderPath, zipPath, CompressionLevel.Fastest, false);
                     var mimeType = "application/zip";
                     byte[]? fileBytes;
@@ -138,22 +157,16 @@ namespace Platforma.Application.Files
                 }
                 finally
                 {
-                    DeleteTempFiles(zipPath, tempFolderPath);
+                    if (File.Exists(zipPath))
+                    {
+                        File.Delete(zipPath);
+                    }
+                    if (Directory.Exists(tempFolderPath))
+                    {
+                        Directory.Delete(tempFolderPath, true);
+                    }
                 }
             }
-
-            private void DeleteTempFiles(string tempPath, string zipPath)
-            {
-                if (File.Exists(zipPath))
-                {
-                    File.Delete(zipPath);
-                }
-                if (Directory.Exists(tempPath))
-                {
-                    Directory.Delete(tempPath, true);
-                }
-            }
-
             private void CopyDirectory(string sourceDir, string destinationDir, bool recursive)
             {
                 // Get information about the source directory
