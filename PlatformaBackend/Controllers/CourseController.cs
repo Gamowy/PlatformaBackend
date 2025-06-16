@@ -14,9 +14,9 @@ namespace PlatformaBackend.Controllers
         /// Get a list of all courses
         /// </summary>
         [HttpGet]
-        public async Task<ActionResult<List<Course>>> GetAllCourses()
+        public async Task<ActionResult<List<Course>>> GetAllCourses(string? searchPhrase)
         {
-            var result = await Mediator.Send(new CourseList.Query());
+            var result = await Mediator.Send(new CourseList.Query() { SearchedPhrase = searchPhrase });
             if (result == null || (result.IsSuccess && result.Value == null))
                 return NotFound();
             if (result.IsSuccess && result.Value != null)
@@ -31,7 +31,7 @@ namespace PlatformaBackend.Controllers
         public async Task<ActionResult<List<Course>>> GetUsersCourses()
         {
             if (HttpContextAccessor.HttpContext!.User.FindFirst(ClaimTypes.Role)!.Value.Equals(Platforma.Domain.User.Roles.Administrator))
-                return await GetAllCourses();
+                return await GetAllCourses(null);
 
             var result = await Mediator.Send(new CourseListForUser.Query 
                 { UserId = Guid.Parse(HttpContextAccessor.HttpContext!.User.FindFirst("UserId")!.Value) });
