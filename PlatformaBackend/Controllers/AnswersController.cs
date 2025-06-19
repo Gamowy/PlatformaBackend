@@ -89,6 +89,22 @@ namespace PlatformaBackend.Controllers
         }
 
         /// <summary>
+        /// Get number of marked and unmarked answers for each assigment of courses for specified teacher
+        /// </summary>
+        [HttpGet("course/userCount")]
+        [Authorize(Roles = Platforma.Domain.User.Roles.Teacher)]
+        public async Task<ActionResult<NumberOfAnswersWithNameDTO>> GetNumberOfAnswersForSpecifiedUser()
+        {
+            var finalUserId = Guid.Parse(HttpContextAccessor.HttpContext!.User.FindFirst("UserId")!.Value);
+            var result = await Mediator.Send(new GetNotificationListOfUnfinishedAssigment.Query { UserId = finalUserId });
+            if (result == null || (result.IsSuccess && result.Value == null))
+                return NotFound();
+            if (result.IsSuccess && result.Value != null)
+                return Ok(result.Value);
+            return BadRequest(result.Error);
+        }
+
+        /// <summary>
         /// Used to mark answers as teacher
         /// </summary>
         [HttpPut("mark/{answerId}")]
