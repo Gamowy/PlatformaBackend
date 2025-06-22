@@ -167,6 +167,23 @@ namespace PlatformaBackend.Controllers
                 return Ok(result.Value);
             return BadRequest(result.Error);
         }
+
+        /// <summary>
+        /// Get courses with close deadlines
+        /// </summary>
+        [HttpGet("deadlines")]
+        [Authorize(Policy = "NotAdmin")]
+        public async Task<ActionResult<List<Course>>> GetCoursesWithCloseDeadlines()
+        {
+            var userId = Guid.Parse(HttpContextAccessor.HttpContext!.User.FindFirst("UserId")!.Value);
+
+            var result = await Mediator.Send(new GetCoursesWithCloseDeadlines.Query { UserId = userId});
+            if (result == null || (result.IsSuccess && result.Value == null))
+                return NotFound();
+            if (result.IsSuccess && result.Value != null)
+                return Ok(result.Value);
+            return BadRequest(result.Error);
+        }
     }
 
 }

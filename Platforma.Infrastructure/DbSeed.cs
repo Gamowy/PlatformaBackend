@@ -102,7 +102,7 @@ namespace Platforma.Infrastructure
             var assignment = new Assignment
             {
                 Name = "TestLab",
-                Content = "wykonaj polecenia zawarte w pliku Lab1.pdf i zamieść odpowiedź na patformie",
+                Content = "Wykonaj polecenia zawarte w pliku Lab1.pdf i zamieść odpowiedź na platformie",
                 Course = testCourse,
                 OpenDate = DateTime.UtcNow.AddDays(-3),
                 Deadline = DateTime.UtcNow.AddDays(4),

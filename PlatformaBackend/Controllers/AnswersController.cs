@@ -106,7 +106,7 @@ namespace PlatformaBackend.Controllers
 
 
         /// <summary>
-        /// Get list of student with answear and mark
+        /// Get list of student with answer and mark
         /// </summary>
         [HttpGet("course/{courseId}/assigment/{assigmentId}")]
         [Authorize(Roles = Platforma.Domain.User.Roles.Teacher)]
