@@ -30,7 +30,7 @@ namespace Platforma.Application.Courses
             {
                 // Get course IDs for the user
                 var userCourseIds = await _context.CourseUsers
-                    .Where(cu => cu.UserID == request.UserId)
+                    .Where(cu => cu.UserID == request.UserId && cu.Status == UserStatus.Accepted)
                     .Select(cu => cu.CourseID)
                     .ToListAsync(cancellationToken);
                 if (userCourseIds.Count == 0)
